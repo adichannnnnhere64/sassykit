@@ -5,7 +5,7 @@ x-logging: &default-logging
     max-file: 6
 
 x-base: &base
-  profiles: [app]
+  # profiles: [app] ← removed this line
   image: ghcr.io/adichannnnnhere64/sassykit:production
   user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
   ulimits:
@@ -66,3 +66,4 @@ volumes:
     driver: local
   fonts:
     driver: local
+
