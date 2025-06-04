@@ -7,6 +7,8 @@ pest()->extend(Tests\DuskTestCase::class)
 //  ->use(Illuminate\Foundation\Testing\DatabaseMigrations::class)
 
 use App\Models\User;
+use Modules\Team\Database\Seeders\AdminRoleSeeder;
+use Modules\Team\Database\Seeders\MemberRoleSeeder;
 use Spatie\Permission\Models\Role;
 
 use function Pest\Laravel\actingAs;
@@ -24,9 +26,21 @@ use function Pest\Laravel\actingAs;
 
 pest()->extend(Tests\TestCase::class)
     ->use(Illuminate\Foundation\Testing\RefreshDatabase::class)
-    ->in('Feature');
+    ->in('Feature',
+        '../app-modules/*/tests/Feature',
+    )
+    ->beforeEach(function () {
+
+        $this->seed([
+            AdminRoleSeeder::class,
+            MemberRoleSeeder::class,
+        ]);
+
+    });
 
 /*
+ *
+
 |--------------------------------------------------------------------------
 | Expectations
 |--------------------------------------------------------------------------

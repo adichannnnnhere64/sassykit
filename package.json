@@ -24,15 +24,20 @@
         "prettier": "^3.5.3",
         "prettier-plugin-organize-imports": "^4.1.0",
         "prettier-plugin-tailwindcss": "^0.6.11",
+        "tailwindcss-motion": "^1.1.0",
         "typescript-eslint": "^8.32.1",
         "vite-plugin-compression2": "^1.3.3"
     },
     "dependencies": {
+        "@dnd-kit/core": "^6.3.1",
+        "@dnd-kit/modifiers": "^9.0.0",
+        "@dnd-kit/sortable": "^10.0.0",
         "@headlessui/react": "^2.2.3",
         "@inertiajs/react": "^2.0.11",
         "@mantine/carousel": "^7.17.7",
         "@mantine/core": "^7.17.7",
         "@mantine/dates": "^7.17.7",
+        "@mantine/dropzone": "^8.0.2",
         "@mantine/hooks": "^7.17.7",
         "@mantine/modals": "^7.17.7",
         "@mantine/notifications": "^7.17.7",
@@ -47,9 +52,12 @@
         "class-variance-authority": "^0.7.1",
         "clsx": "^2.1.1",
         "concurrently": "^9.1.2",
+        "dayjs": "^1.11.13",
         "embla-carousel-react": "^8.6.0",
         "globals": "^15.15.0",
+        "immer": "^10.1.1",
         "laravel-vite-plugin": "^1.2.0",
+        "mantine-react-table": "^2.0.0-beta.9",
         "react": "^19.1.0",
         "react-dom": "^19.1.0",
         "tailwind-merge": "^3.3.0",
@@ -57,7 +65,8 @@
         "tailwindcss-animate": "^1.0.7",
         "terser": "^5.39.2",
         "typescript": "^5.8.3",
-        "vite": "^6.3.5"
+        "vite": "^6.3.5",
+        "vite-tsconfig-paths": "^5.1.4"
     },
     "optionalDependencies": {
         "@rollup/rollup-linux-x64-gnu": "4.9.5",

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Providers;
 
 use App\Models\User;
+use App\Support\InertiaSharedData;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\URL;
@@ -19,7 +21,12 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
-        //
+        Request::macro('wantsModal', function () {
+            return $this->header('X-Modal') ? true : false;
+        });
+
+
+       $this->app->bind(InertiaSharedData::class, fn () => new InertiaSharedData());
     }
 
     /**
@@ -27,6 +34,7 @@ final class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+
         JsonResource::withoutWrapping();
 
         if (! app()->isProduction()) {

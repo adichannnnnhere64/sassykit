@@ -6,7 +6,7 @@ namespace App\Http\Middleware;
 
 use App\Enums\Language;
 use App\Http\Resources\LanguageResource;
-use Illuminate\Foundation\Inspiring;
+use App\Support\InertiaSharedData;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
@@ -45,7 +45,9 @@ final class HandleInertiaRequests extends Middleware
      */
     public function share(Request $request): array
     {
-        [$message, $author] = str(Inspiring::quotes()->random())->explode('-');
+        if ($request->wantsModal()) {
+            return [];
+        }
         /** @var array{
                github: bool,
                x: bool,
@@ -57,27 +59,43 @@ final class HandleInertiaRequests extends Middleware
 
         $socials = collect(SocialiteUi::providers()->toArray())->filter(fn (array $item) => $availableSocials->contains($item['id']));
 
-        return [
+        return array_merge([
             ...parent::share($request),
             'name' => config('app.name'),
-            'quote' => ['message' => mb_trim((string) $message), 'author' => mb_trim((string) $author)],
             'auth' => [
                 'user' => $request->user()?->load('socialAccounts'),
+                'can' => optional($request->user()?->loadMissing('roles.permissions'))->roles
+                    ?->flatMap(function ($role) {
+                        return $role->permissions ?? [];
+                    })->mapWithKeys(function ($permission) {
+                        $title = $permission['name'] ?? null;
+                        if ($title && auth()->check()) {
+                            $canDo = auth()->user()->can($title);
+                            $formattedKey = str_replace(' ', '_', $title);
+
+                            return [
+                                $formattedKey => $canDo,    // Add formatted version for easy frontend access
+                            ];
+                        }
+
+                        return [];
+                    })?->all() ?? [],
+
             ],
             'socialiteUi' => [
-                'error' => $request->session()->get('socialite-ui.error'),
-                'providers' => $socials->values()->toArray(),
-                'hasPassword' => ! is_null($request->user()?->getAuthPassword()),
-            ],
+                            'error' => $request->session()->get('socialite-ui.error'),
+                            'providers' => $socials->values()->toArray(),
+                            'hasPassword' => ! is_null($request->user()?->getAuthPassword()),
+                        ],
             'language' => app()->getLocale(),
             'translations' => cache()->rememberForever('translations.'.app()->getLocale(), fn () => collect(File::allFiles(base_path('lang/'.app()->getLocale())))
-                ->flatMap(fn (SplFileInfo $file) => Arr::dot(
-                    File::getRequire($file->getRealPath()),
-                    $file->getBasename('.'.$file->getExtension()).'.'
-                ))
-                ->toArray()
+                            ->flatMap(fn (SplFileInfo $file) => Arr::dot(
+                                File::getRequire($file->getRealPath()),
+                                $file->getBasename('.'.$file->getExtension()).'.'
+                            ))
+                            ->toArray()
             ),
-            'notification' => collect(Arr::only($request->session()->all(), ['success', 'error', 'warning']))
+            'notification' => collect(Arr::only(session()->all(), ['success', 'error', 'warning']))
                 ->mapWithKeys(function ($notification, $key) {
                     return ['type' => $key, 'body' => $notification];
                 }),
@@ -86,7 +104,12 @@ final class HandleInertiaRequests extends Middleware
                 ...(new Ziggy)->toArray(),
                 'location' => $request->url(),
             ],
+            'csrf_token' => csrf_token(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
-        ];
+            'features' => collect(config('custom.features', []))->pluck('value'),
+            'module' => [
+                'has_team' => false,
+            ],
+        ], app(InertiaSharedData::class)->all());
     }
 }
