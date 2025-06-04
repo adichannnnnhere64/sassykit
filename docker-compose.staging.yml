@@ -10,6 +10,7 @@ x-base: &base
   user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
   environment:
     WITH_SSR: true
+    APP_KEY: '${APP_KEY}'
   ulimits:
     nofile:
       soft: 20000
