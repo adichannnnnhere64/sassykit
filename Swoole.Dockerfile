@@ -17,6 +17,7 @@ ARG WWWUSER=1000
 ARG WWWGROUP=1000
 ARG TZ=UTC
 ARG APP_ENV
+ARG APP_KEY
 
 ENV DEBIAN_FRONTEND=noninteractive \
     TERM=xterm-color \
@@ -24,6 +25,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     TZ=${TZ} \
     USER=octane \
     APP_ENV=${APP_ENV} \
+    APP_KEY=${APP_KEY} \
     ROOT=/var/www/html \
     COMPOSER_FUND=0 \
     COMPOSER_MAX_PARALLEL_HTTP=24
@@ -146,6 +148,7 @@ ARG APP_ENV
 
 ENV ROOT=/var/www/html \
     APP_ENV=${APP_ENV} \
+    APP_KEY=${APP_KEY} \
     NODE_ENV=${APP_ENV:-production}
 
 WORKDIR ${ROOT}
