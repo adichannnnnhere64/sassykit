@@ -8,6 +8,8 @@ x-base: &base
   # profiles: [app] ← removed this line
   image: ghcr.io/adichannnnnhere64/sassykit:production
   user: "${HOST_UID:-1000}:${HOST_GID:-1000}"
+  environment:
+    WITH_SSR: true
   ulimits:
     nofile:
       soft: 20000
