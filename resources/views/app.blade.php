@@ -25,6 +25,26 @@
         })();
     </script>
 
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "LocalBusiness",
+            "name": "SassyKit",
+            "email": "mobistyle35@gmail.com",
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "areaServed": "PH"
+            }
+        }
+    </script>
+
+          <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2165217194424630"
+        crossorigin="anonymous"></script>
+
+    <script defer src="https://analytics.761073128.xyz/script.js" data-website-id="0fe48d21-2642-4120-8a60-47f079cf8f75"></script>
+
+
+
     {{-- Inline style to set the HTML background color based on our theme in app.css --}}
     <style>
         html {
