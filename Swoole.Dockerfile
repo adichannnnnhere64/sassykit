@@ -170,6 +170,7 @@ USER ${USER}
 
 ENV WITH_HORIZON=false \
     WITH_SCHEDULER=false \
+    WITH_SSR=false \
     WITH_REVERB=false
 
 COPY --link --chown=${WWWUSER}:${WWWUSER} . .
