@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // use Modules\Tag\Http\Controllers\TagController;
 
 // Route::get('/tags', [TagController::class, 'index'])->name('tags.index');

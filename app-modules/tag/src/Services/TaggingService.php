@@ -1,11 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Tag\Services;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\Tag\Contracts\TagRepositoryInterface;
+use Str;
 
-class TaggingService
+final class TaggingService
 {
     public function __construct(
         protected TagRepositoryInterface $repo
@@ -13,8 +16,7 @@ class TaggingService
 
     public function syncTags(Model $model, array $tagNames): void
     {
-        $tagIds = collect($tagNames)->map(fn($name) =>
-            $this->repo->findOrCreateByName($name)->id
+        $tagIds = collect($tagNames)->map(fn ($name) => $this->repo->findOrCreateByName($name)->id
         );
 
         $model->tags()->sync($tagIds);
@@ -28,8 +30,9 @@ class TaggingService
 
     public function detachTag(Model $model, string $tagName): void
     {
-        $tag = $this->repo->findBySlug(\Str::slug($tagName));
-        if ($tag) $model->tags()->detach($tag->id);
+        $tag = $this->repo->findBySlug(Str::slug($tagName));
+        if ($tag) {
+            $model->tags()->detach($tag->id);
+        }
     }
 }
-

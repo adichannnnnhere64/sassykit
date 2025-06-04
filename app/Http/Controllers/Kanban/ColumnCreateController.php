@@ -15,7 +15,6 @@ use Module\Kanban\Actions\UpdateColumnTitle;
 
 final class ColumnCreateController extends Controller
 {
-
     public function create(int $board_id): Response
     {
         return Inertia::render('modules/kanban/modals/create-column', [
@@ -70,5 +69,4 @@ final class ColumnCreateController extends Controller
 
         return back()->with('success', 'Column title updated successfully');
     }
-
 }

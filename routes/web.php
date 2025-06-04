@@ -34,7 +34,7 @@ Route::post('/check-permission', function (Request $request) {
     ]);
 
     try {
-        if ( is_null(@$validated['resource'])) {
+        if (is_null(@$validated['resource'])) {
             return response()->json([
                 'can' => $request->user()->can($validated['permission']),
             ]);

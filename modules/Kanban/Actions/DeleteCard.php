@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Module\Kanban\Actions;
 
-use Module\Kanban\Models\Board;
 use Module\Kanban\Models\Card;
 
 final class DeleteCard
@@ -15,6 +14,7 @@ final class DeleteCard
         $card = Card::find($id);
 
         $card->delete();
+
         return $card;
     }
 }

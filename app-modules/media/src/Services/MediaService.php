@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Media\Services;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,7 +9,7 @@ use Illuminate\Http\UploadedFile;
 use Modules\Media\Contracts\MediaRepositoryInterface;
 use Plank\Mediable\Media;
 
-class MediaService
+final class MediaService
 {
     public function __construct(
         private MediaRepositoryInterface $mediaRepository
@@ -24,4 +26,3 @@ class MediaService
         return $media;
     }
 }
-

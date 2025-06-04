@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Models\User;
-use Inertia\Testing\AssertableInertia;
 use Modules\Team\Http\Middleware\TeamsPermission;
 use Modules\Team\Models\Team;
 
@@ -163,4 +162,3 @@ it('cannot leave a team that it does not belong to', function () {
         ->assertForbidden();
 
 });
-

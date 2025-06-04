@@ -13,7 +13,7 @@ final class DeleteColumn
         $board = Board::find($data['board_id']);
         $column = $board->columns()->where('title', $data['column_id'])->first();
 
-        if (!$column) {
+        if (! $column) {
             return;
         }
 

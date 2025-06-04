@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Tag\Traits;
 
 use Modules\Tag\Models\Tag;
@@ -32,4 +34,3 @@ trait HasTags
         $this->tagService()->detachTag($this, $tag);
     }
 }
-

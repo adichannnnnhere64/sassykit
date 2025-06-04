@@ -6,7 +6,6 @@ use App\Http\Controllers\Kanban\BoardCreateController;
 use App\Http\Controllers\Kanban\BoardOrderController;
 use App\Http\Controllers\Kanban\CardCreateController;
 use App\Http\Controllers\Kanban\CardFilesController;
-use App\Http\Controllers\Kanban\CardOrderController;
 use App\Http\Controllers\Kanban\ColumnCreateController;
 use App\Http\Controllers\Kanban\ColumnOrderController;
 use Illuminate\Support\Facades\Route;
@@ -29,7 +28,6 @@ Route::group(['prefix' => 'columns', 'middleware' => 'auth'], function () {
     Route::get('/confirm-delete', [ColumnCreateController::class, 'confirmDelete'])->name('module.kanban.column.confirm-delete');
     Route::patch('/update-title', [ColumnCreateController::class, 'updateTitle'])->name('module.kanban.column.update-title');
 });
-
 
 Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
 

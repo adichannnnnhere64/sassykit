@@ -40,10 +40,10 @@ final class TeamServiceProvider extends ServiceProvider
 
             if (auth()->user()) {
 
-            $inertia->share('module.team.teams', fn () => auth()->check() ?
-               TeamData::collect(auth()->user()->load(['teams'])->teams()->with(['members'])->get())
-                : []);
-            $inertia->share('module.team.current_team', fn () => TeamData::from(auth()->user()?->currentTeam()->with('members')->first()));
+                $inertia->share('module.team.teams', fn () => auth()->check() ?
+                   TeamData::collect(auth()->user()->load(['teams'])->teams()->with(['members'])->get())
+                    : []);
+                $inertia->share('module.team.current_team', fn () => TeamData::from(auth()->user()?->currentTeam()->with('members')->first()));
 
             }
 

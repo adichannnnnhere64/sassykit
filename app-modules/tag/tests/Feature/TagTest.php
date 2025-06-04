@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
 use Modules\Tag\Models\Tag;
@@ -14,13 +16,15 @@ beforeEach(function () {
 });
 
 // Define a mock taggable model
-class MockModel extends Model
+final class MockModel extends Model
 {
     use HasTags;
 
-    protected $table = 'mock_models';
-    protected $guarded = [];
     public $timestamps = true;
+
+    protected $table = 'mock_models';
+
+    protected $guarded = [];
 }
 
 it('creates a tag with the factory', function () {
@@ -49,4 +53,3 @@ it('can sync multiple tags on a mock model', function () {
     expect($tagNames)->toContain('Testing');
     expect($model->tags)->toHaveCount(3);
 });
-

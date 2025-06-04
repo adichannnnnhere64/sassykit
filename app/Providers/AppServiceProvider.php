@@ -25,8 +25,7 @@ final class AppServiceProvider extends ServiceProvider
             return $this->header('X-Modal') ? true : false;
         });
 
-
-       $this->app->bind(InertiaSharedData::class, fn () => new InertiaSharedData());
+        $this->app->bind(InertiaSharedData::class, fn () => new InertiaSharedData());
     }
 
     /**

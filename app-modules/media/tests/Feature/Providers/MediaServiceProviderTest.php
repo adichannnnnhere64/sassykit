@@ -1,18 +1,24 @@
 <?php
 
-use Modules\Media\Services\MediaService;
+declare(strict_types=1);
+
 use Illuminate\Http\UploadedFile;
 use Modules\Media\Contracts\MediaRepositoryInterface;
+use Modules\Media\Services\MediaService;
 use Plank\Mediable\Media;
 
 it('uploads and attaches media', function () {
     $file = UploadedFile::fake()->image('card.jpg');
 
     // Fake model with attachMedia method
-    $model = new class extends \Illuminate\Database\Eloquent\Model {
-        use \Plank\Mediable\Mediable;
+    $model = new class extends Illuminate\Database\Eloquent\Model
+    {
+        use Plank\Mediable\Mediable;
+
         protected $table = 'mock_models';
-        public function attachMedia($media, $tag) {
+
+        public function attachMedia($media, $tag)
+        {
             // Just pretend it's attached
         }
     };
@@ -31,4 +37,3 @@ it('uploads and attaches media', function () {
 
     expect($result)->toBe($media);
 });
-

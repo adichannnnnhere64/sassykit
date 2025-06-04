@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Modules\Tag\Database\Factories;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Module\Kanban\Models\Board;
 use Modules\Tag\Models\Tag;
 
 final class TagFactory extends Factory

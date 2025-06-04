@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // use Modules\Upvote\Http\Controllers\UpvoteController;
 
 // Route::get('/upvotes', [UpvoteController::class, 'index'])->name('upvotes.index');

@@ -14,7 +14,7 @@ final class TeamData extends Data
     public function __construct(
         public int $id,
         public string $name,
-        /** @var \Modules\Team\DTOs\TeamMemberData[] */
+        /** @var TeamMemberData[] */
         public DataCollection $members
     ) {}
 }

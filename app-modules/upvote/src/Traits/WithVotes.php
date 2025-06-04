@@ -1,9 +1,11 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Upvote\Traits;
 
-use Modules\Upvote\Models\Vote;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Modules\Upvote\Models\Vote;
 
 trait WithVotes
 {
@@ -27,4 +29,3 @@ trait WithVotes
         return $this->upvotes()->count() - $this->downvotes()->count();
     }
 }
-

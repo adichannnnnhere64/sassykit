@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Team\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TeamMemberDestroyRequest extends FormRequest
+final class TeamMemberDestroyRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -13,7 +15,7 @@ class TeamMemberDestroyRequest extends FormRequest
     {
         return $this->user()->can('removeTeamMember', [
             $this->team,
-            $this->user
+            $this->user,
         ]);
     }
 
@@ -28,4 +30,3 @@ class TeamMemberDestroyRequest extends FormRequest
         ];
     }
 }
-

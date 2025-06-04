@@ -31,7 +31,6 @@ it('can remove a member', function () {
         $member = User::factory()->create()
     );
 
-
     setPermissionsTeamId($user->currentTeam->id);
 
     $member->currentTeam()->associate($user->currentTeam)->save();
@@ -63,21 +62,16 @@ it('can not remove a member from the team without permission', function () {
 
     actingAs($anotherUser)
         ->withoutMiddleware(TeamsPermission::class)
-        ->delete(route('module.team-member.delete', [ $user->currentTeam, $member ]))
-        ->assertForbidden()
-    ;
+        ->delete(route('module.team-member.delete', [$user->currentTeam, $member]))
+        ->assertForbidden();
 });
-
 
 it('cannot remove self from team', function () {
 
     $user = User::factory()->create();
 
-
     actingAs($user)
-        ->delete(route('module.team-member.delete', [ $user->currentTeam, $user ]))
-        ->assertForbidden()
-    ;
-
+        ->delete(route('module.team-member.delete', [$user->currentTeam, $user]))
+        ->assertForbidden();
 
 });

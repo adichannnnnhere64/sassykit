@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Modules\Team\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Gate;
 use Modules\Team\DTOs\TeamData;
 use Modules\Team\Http\Requests\SetCurrentTeamRequest;
 use Modules\Team\Http\Requests\TeamLeaveRequest;

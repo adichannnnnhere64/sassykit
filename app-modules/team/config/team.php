@@ -1,6 +1,7 @@
 <?php
 
-return [
-    'enabled' => true
-];
+declare(strict_types=1);
 
+return [
+    'enabled' => true,
+];

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Upvote\Repositories;
 
-use Modules\Upvote\Models\Vote;
-use Modules\Upvote\Contracts\VoteRepositoryInterface;
 use Illuminate\Database\Eloquent\Model;
+use Modules\Upvote\Contracts\VoteRepositoryInterface;
+use Modules\Upvote\Models\Vote;
 
-class VoteRepository implements VoteRepositoryInterface
+final class VoteRepository implements VoteRepositoryInterface
 {
     public function toggle(Model $model, int $userId, string $type): ?Vote
     {
@@ -15,10 +17,12 @@ class VoteRepository implements VoteRepositoryInterface
         if ($existing) {
             if ($existing->type === $type) {
                 $existing->delete();
+
                 return null;
             }
 
             $existing->update(['type' => $type]);
+
             return $existing;
         }
 
@@ -33,4 +37,3 @@ class VoteRepository implements VoteRepositoryInterface
         return $model->votes()->where('user_id', $userId)->first();
     }
 }
-

@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Foundation\Testing\RefreshDatabase;
-use Modules\Upvote\Models\Vote;
-use Modules\Upvote\Repositories\VoteRepository;
+declare(strict_types=1);
+
 use App\Models\User;
 use Illuminate\Support\Facades\Schema;
+use Modules\Upvote\Repositories\VoteRepository;
 use Modules\Upvote\Traits\WithVotes;
 
 beforeEach(function () {
@@ -15,19 +15,21 @@ beforeEach(function () {
 
     $this->repo = new VoteRepository();
 
-    $this->votable = new class extends \Illuminate\Database\Eloquent\Model {
+    $this->votable = new class extends Illuminate\Database\Eloquent\Model
+    {
         use WithVotes;
 
-        protected $table = 'votables';
         public $timestamps = false;
+
+        protected $table = 'votables';
+
         protected $guarded = [];
     };
 
     $this->votable->save();
 
-    $this->userId = \App\Models\User::factory()->create()->id;
+    $this->userId = User::factory()->create()->id;
 });
-
 
 it('toggles upvote when none exists', function () {
     $vote = $this->repo->toggle($this->votable, $this->userId, 'up');
@@ -70,5 +72,3 @@ it('allows multiple users to vote', function () {
 
     expect($this->votable->votes()->count())->toBe(2);
 });
-
-

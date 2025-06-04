@@ -13,7 +13,6 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Cashier\Billable;
 use SocialiteUi\Concerns\HasSocialAccounts;
-use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
@@ -62,6 +61,16 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
         return true;
     }
 
+    public function getAvatarUrlAttribute()
+    {
+        return 'https://gravatar.com/avatar/'.md5($this->email).'?s=100';
+    }
+
+    public function getRoleAttribute(): string
+    {
+        return $this->roles()->first()?->name ?? '';
+    }
+
     /**
      * Get the attributes that should be cast.
      *
@@ -73,15 +82,5 @@ final class User extends Authenticatable implements FilamentUser, HasAvatar
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
-    }
-
-    public function getAvatarUrlAttribute()
-    {
-        return 'https://gravatar.com/avatar/' . md5($this->email) . '?s=100';
-    }
-
-    public function getRoleAttribute(): string
-    {
-        return $this->roles()->first()?->name ?? '';
     }
 }

@@ -1,17 +1,18 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Modules\Team\Observers;
 
 use App\Models\User;
 use Modules\Team\Models\Team;
 
-class UserObserver
+final class UserObserver
 {
     public function created(User $user)
     {
         $team = Team::create([
-            'name' => $user->name
+            'name' => $user->name,
         ]);
 
         if ($team) {
@@ -30,4 +31,3 @@ class UserObserver
         $user->teams()->detach();
     }
 }
-

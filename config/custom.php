@@ -6,7 +6,7 @@ use App\Enums\Feature;
 
 return [
     'features' => [
-        Feature::Teams
+        Feature::Teams,
     ],
     'socials' => [
         'github' => env('SOCIAL_GITHUB', false),

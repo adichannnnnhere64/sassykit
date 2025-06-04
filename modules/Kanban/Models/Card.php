@@ -27,11 +27,6 @@ final class Card extends Model implements MediableInterface
         return $this->belongsTo(Column::class);
     }
 
-    protected static function newFactory()
-    {
-        return CardFactory::new();
-    }
-
     public function getMediaCardAttribute()
     {
         return $this->getMedia('card')->first()?->getUrl() ?? '/';
@@ -40,5 +35,10 @@ final class Card extends Model implements MediableInterface
     public function getMediaTypeAttribute()
     {
         return $this->getMedia('card')->first()?->aggregate_type ?? 'image';
+    }
+
+    protected static function newFactory()
+    {
+        return CardFactory::new();
     }
 }

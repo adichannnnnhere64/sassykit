@@ -1,11 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Module\Kanban\Actions;
 
 use Module\Kanban\Models\Board;
 use Module\Kanban\Models\Card; // Assuming you have a Card model
-use Module\Kanban\Models\Column;
 
 final class UpdateCardOrder
 {
@@ -20,7 +20,7 @@ final class UpdateCardOrder
 
         return [
             'success' => true,
-            'updated_cards' => count($data['order'])
+            'updated_cards' => count($data['order']),
         ];
     }
 

@@ -15,6 +15,5 @@ final class MediaServiceProvider extends ServiceProvider
         $this->app->bind(MediaRepositoryInterface::class, MediaRepository::class);
     }
 
-    public function boot(): void {
-    }
+    public function boot(): void {}
 }

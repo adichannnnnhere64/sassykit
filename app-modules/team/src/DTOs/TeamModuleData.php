@@ -13,7 +13,7 @@ final class TeamModuleData extends Data
 {
     public function __construct(
         public bool $has_team,
-        /** @var \Modules\Team\DTOs\TeamData[] */
+        /** @var TeamData[] */
         public DataCollection $teams,
         public TeamData $current_team,
     ) {}

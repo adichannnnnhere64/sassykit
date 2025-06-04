@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Upvote\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Vote extends Model
+final class Vote extends Model
 {
     protected $fillable = ['user_id', 'type'];
 
@@ -13,4 +15,3 @@ class Vote extends Model
         return $this->morphTo();
     }
 }
-

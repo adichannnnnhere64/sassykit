@@ -25,7 +25,6 @@ final class UpdateBoardOrder
 
                 $card = Card::find($cardId);
 
-
                 if (! $card) {
                     continue; // Or log warning
                 }
@@ -42,5 +41,4 @@ final class UpdateBoardOrder
             'updated_columns' => count($data['columns_with_card_ids']),
         ];
     }
-
 }

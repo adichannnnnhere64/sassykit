@@ -9,9 +9,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
-use Module\Kanban\Actions\CreateCard;
 use Module\Kanban\Actions\CreateCardFiles;
-use Module\Kanban\Actions\CreateColumn;
 
 final class CardFilesController extends Controller
 {

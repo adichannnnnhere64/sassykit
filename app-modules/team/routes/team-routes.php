@@ -1,9 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 // use Modules\Team\Http\Controllers\TeamController;
 //
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Modules\Team\Http\Controllers\TeamController;
 use Modules\Team\Http\Controllers\TeamMemberController;
@@ -18,7 +19,6 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::delete('/team-member/{team}/{user}', [TeamMemberController::class, 'destroy'])->name('module.team-member.delete');
 
 });
-
 
 // Route::get('/teams', [TeamController::class, 'index'])->name('teams.index');
 // Route::get('/teams/create', [TeamController::class, 'create'])->name('teams.create');

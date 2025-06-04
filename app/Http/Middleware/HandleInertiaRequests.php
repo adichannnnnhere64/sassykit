@@ -83,17 +83,17 @@ final class HandleInertiaRequests extends Middleware
 
             ],
             'socialiteUi' => [
-                            'error' => $request->session()->get('socialite-ui.error'),
-                            'providers' => $socials->values()->toArray(),
-                            'hasPassword' => ! is_null($request->user()?->getAuthPassword()),
-                        ],
+                'error' => $request->session()->get('socialite-ui.error'),
+                'providers' => $socials->values()->toArray(),
+                'hasPassword' => ! is_null($request->user()?->getAuthPassword()),
+            ],
             'language' => app()->getLocale(),
             'translations' => cache()->rememberForever('translations.'.app()->getLocale(), fn () => collect(File::allFiles(base_path('lang/'.app()->getLocale())))
-                            ->flatMap(fn (SplFileInfo $file) => Arr::dot(
-                                File::getRequire($file->getRealPath()),
-                                $file->getBasename('.'.$file->getExtension()).'.'
-                            ))
-                            ->toArray()
+                ->flatMap(fn (SplFileInfo $file) => Arr::dot(
+                    File::getRequire($file->getRealPath()),
+                    $file->getBasename('.'.$file->getExtension()).'.'
+                ))
+                ->toArray()
             ),
             'notification' => collect(Arr::only(session()->all(), ['success', 'error', 'warning']))
                 ->mapWithKeys(function ($notification, $key) {

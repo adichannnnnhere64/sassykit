@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Tag\Repositories;
 
-use Modules\Tag\Models\Tag;
 use Illuminate\Support\Str;
 use Modules\Tag\Contracts\TagRepositoryInterface;
+use Modules\Tag\Models\Tag;
 
-class TagRepository implements TagRepositoryInterface
+final class TagRepository implements TagRepositoryInterface
 {
     public function findOrCreateByName(string $name): Tag
     {
@@ -21,4 +23,3 @@ class TagRepository implements TagRepositoryInterface
         return Tag::where('slug', $slug)->first();
     }
 }
-

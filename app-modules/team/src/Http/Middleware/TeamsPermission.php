@@ -1,17 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Team\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class TeamsPermission
+final class TeamsPermission
 {
     /**
      * Handle an incoming request.
      *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     * @param  Closure(Request): (Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
@@ -23,5 +25,4 @@ class TeamsPermission
 
         return $next($request);
     }
-
 }

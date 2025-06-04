@@ -11,7 +11,6 @@ use Inertia\Inertia;
 use Inertia\Response;
 use Module\Kanban\Actions\CreateCard;
 use Module\Kanban\Actions\CreateCardFiles;
-use Module\Kanban\Actions\CreateColumn;
 use Module\Kanban\Actions\DeleteCard;
 use Module\Kanban\DTOs\CardData;
 use Module\Kanban\Models\Card;
@@ -31,9 +30,8 @@ final class CardCreateController extends Controller
         $data = $request->validate([
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
             'column_id' => 'required',
-            'files' => 'array'
+            'files' => 'array',
         ]);
-
 
         $createCardFiles->handle($data, $data['files']);
 
@@ -45,7 +43,7 @@ final class CardCreateController extends Controller
         $data = $request->validate([
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
             'column_id' => 'required',
-            'content' => 'required'
+            'content' => 'required',
         ]);
 
         $createCard->handle($data);
@@ -53,12 +51,9 @@ final class CardCreateController extends Controller
         return back()->with('success', 'Card created successfully');
     }
 
-
-
-
     public function destroy(Request $request, DeleteCard $deleteCard): RedirectResponse
     {
-        $board  = $deleteCard->handle($request->validate([
+        $board = $deleteCard->handle($request->validate([
             'card_id' => 'required|string',
         ]));
 
@@ -90,5 +85,4 @@ final class CardCreateController extends Controller
             'card' => CardData::from($card),
         ]);
     }
-
 }

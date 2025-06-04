@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Team\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class TeamUpdateRequest extends FormRequest
+final class TeamUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,4 +28,3 @@ class TeamUpdateRequest extends FormRequest
         ];
     }
 }
-

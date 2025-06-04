@@ -11,5 +11,5 @@ return [
     App\Providers\SocialiteUiServiceProvider::class,
     SocialiteUi\SocialiteUiServiceProvider::class,
     FilamentShieldServiceProvider::class,
-    PermissionServiceProvider::class
+    PermissionServiceProvider::class,
 ];

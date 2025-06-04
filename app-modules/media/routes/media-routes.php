@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 // use Modules\Media\Http\Controllers\MediaController;
 
 // Route::get('/media', [MediaController::class, 'index'])->name('media.index');

@@ -1,12 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Modules\Tag\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Modules\Tag\Database\Factories\TagFactory;
 
-class Tag extends Model
+final class Tag extends Model
 {
     use HasFactory;
 
@@ -14,6 +16,4 @@ class Tag extends Model
     {
         return TagFactory::new();
     }
-
 }
-
