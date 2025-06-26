@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\Kanban\BoardCopyController;
 use App\Http\Controllers\LanguageStoreController;
 use App\Http\Controllers\PlanController;
 use App\Models\User;
@@ -58,6 +59,9 @@ Route::post('/check-permission', function (Request $request) {
         ], 400);
     }
 })->middleware(['web', 'auth'])->name('check-permission');
+
+Route::post('/copy', BoardCopyController::class)->name('board.copy');
+Route::post('/copy-all', [ BoardCopyController::class, 'copyAll' ])->name('board.copy.all');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/billings.php';

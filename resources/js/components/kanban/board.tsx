@@ -8,7 +8,7 @@ import {
     verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { Link, router } from '@inertiajs/react';
+import { Link, router, useForm, usePage } from '@inertiajs/react';
 import { Button, Flex } from '@mantine/core';
 import { produce } from 'immer';
 import { useEffect, useRef, useState } from 'react';
@@ -218,22 +218,46 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
         setActiveType(null);
         document.body.classList.remove('dragging-active');
     };
+    const csrf_token = String(usePage().props.csrf_token);
+
+    const copyAll = async (board_id: number) => {
+        await fetch(route('board.copy.all'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ board_id}),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                navigator.clipboard.writeText(data.clipboard).then(() => {
+                    alert('Copied to clipboard');
+                });
+            });
+    };
+
+
+
 
     return (
-        <div className="min-h-screen">
+        <div className="mt-8">
             <div className="border-b border-gray-200 py-4">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-2xl font-bold text-gray-900">Board: {board?.title ?? ''}</h1>
+                    <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Board: {board?.title ?? ''}</h1>
                     <div className="relative z-50">
                         <button
                             onClick={() => setDropdownOpen(!dropdownOpen)}
                             className="hover: flex items-center gap-2 rounded-lg border border-gray-300 px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
                         >
-                            <span className="text-sm font-medium text-gray-700">
+                            <span className="text-sm font-medium text-gray-700 dark:text-white">
                                 {viewMode === 'horizontal' ? 'Horizontal View' : 'Vertical View'}
                             </span>
                             <svg
-                                className={`h-4 w-4 text-gray-500 transition-transform ${dropdownOpen ? 'rotate-180' : ''}`}
+                                className={`h-4 w-4 text-gray-500 transition-transform dark:text-white ${dropdownOpen ? 'rotate-180' : ''}`}
                                 fill="none"
                                 viewBox="0 0 24 24"
                                 stroke="currentColor"
@@ -243,7 +267,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                         </button>
 
                         {dropdownOpen && (
-                            <div className="absolute right-0 mt-2 w-48 rounded-lg border border-gray-200 shadow-lg">
+                            <div className="absolute right-0 mt-2 w-48 rounded-lg border bg-white shadow-lg">
                                 <button
                                     onClick={() => {
                                         setViewMode('horizontal');
@@ -271,7 +295,8 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                     </div>
                 </div>
             </div>
-            <Flex justify={'end'} py={'xs'}>
+            <Flex justify={'space-between'} py={'xs'}>
+                <Button onClick={() => copyAll(board?.id)}>Copy All</Button>
                 <ModalLink href={route('module.kanban.column.create', { board_id: board?.id })}>Create Column</ModalLink>
             </Flex>
 
@@ -408,6 +433,63 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
         }
     };
 
+    const { data, setData, post } = useForm({
+        board_id: board_id,
+        column_id: id,
+    });
+
+    const adi = usePage().props;
+
+    //       useEffect(() => {
+    //     if (clipboard) {
+    //             alert('bobo')
+
+    //     }
+    //   }, [clipboard]);
+
+    const csrf_token = String(usePage().props.csrf_token);
+
+    const copyAll = async (board_id: number, column_id: number) => {
+        await fetch(route('board.copy.all'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ board_id, column_id }),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                navigator.clipboard.writeText(data.clipboard).then(() => {
+                    alert('Copied to clipboard');
+                });
+            });
+    };
+
+    const copy = async (board_id: number, column_id: number) => {
+        await fetch(route('board.copy'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ board_id, column_id }),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                navigator.clipboard.writeText(data.clipboard).then(() => {
+                    alert('Copied to clipboard');
+                });
+            });
+    };
+
+
     return (
         <div
             ref={setNodeRef}
@@ -417,7 +499,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
         >
             <div className={`flex flex-col rounded-lg border border-gray-200 shadow-sm ${isDragging ? 'border-blue-300 shadow-xl' : ''} group`}>
                 <div className="cursor-move border-b border-gray-100 p-4" {...attributes} {...listeners}>
-                    <div className="flex items-center justify-between">
+                    <div className={`flex items-center justify-between ${viewMode === 'horizontal' ? 'flex-wrap space-y-4' : 'gap-4'}`}>
                         <div className="flex items-center gap-2">
                             <button onClick={onToggleCollapse} className="text-gray-400 hover:text-gray-600">
                                 <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -445,9 +527,11 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </h2>
                             )}
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className={`flex items-center gap-2 ${viewMode == 'horizontal' ? 'flex-wrap' : ''}`}>
                             <ModalLink href={`${route('module.kanban.card.create', { column_id: id, board_id: board_id })}`}>Add Card</ModalLink>
-                            <ModalLink href={`${route('module.kanban.card.create-files', { column_id: id, board_id: board_id })}`}>Add Files</ModalLink>
+                            <ModalLink href={`${route('module.kanban.card.create-files', { column_id: id, board_id: board_id })}`}>
+                                Add Files
+                            </ModalLink>
                             <ModalLink
                                 variant="danger"
                                 href={`${route('module.kanban.column.confirm-delete', { column_id: id, board_id: board_id })}`}
@@ -455,7 +539,11 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 Delete
                             </ModalLink>
 
-                            <span className="text-sm text-gray-500">{cards.length}</span>
+                            <Button variant="danger" onClick={() => copy(board_id, id)}>
+                                Copy
+                            </Button>
+
+                            <span className="flex text-sm text-gray-500">{cards.length}</span>
                         </div>
                     </div>
                 </div>
@@ -471,7 +559,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid sm:grid-cols-5 grid-cols-2 gap-3">
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
                                         <Card key={card.id} id={card.id} image={card.image} title={card.title} viewMode={viewMode} />
@@ -492,8 +580,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
     );
 }
 
-
-function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal'  }) {
+function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal' }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging, over } = useSortable({
         id,
         data: {
@@ -515,51 +602,43 @@ function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal'
             style={style}
             {...attributes}
             {...listeners}
-            className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing ${
+            className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:p-2 dark:text-white ${
                 isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-            } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${
-                viewMode === 'vertical' ? 'flex aspect-square flex-col' : 'min-h-[100px]'
-            }`}
+            } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square flex-col' : 'min-h-[100px]'}`}
         >
             {/* Delete button - only shows on hover */}
             {!isDragOverlay && (
-                <div className="absolute right-2 top-2 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <div className="absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                     <ModalLink
                         variant="danger"
                         size="xs"
                         href={route('module.kanban.card.confirm-delete', { id: id })}
-                        className="rounded-full p-1 shadow-md"
+                        className="rounded-full shadow-md"
                     >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        x
                     </ModalLink>
                 </div>
             )}
 
             {/* Card content */}
-            <div className={`flex h-full flex-col  ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
-                <div className={`text-sm font-medium ${viewMode === 'vertical' ? 'text-center' : ''}`}>
-                    {title}
-                </div>
+            <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
+                <div className={`overflow-scroll text-sm font-medium ${viewMode === 'vertical' ? 'text-center' : ''}`}>{title}</div>
 
                 {image && !title && (
-                    <div className={`rounded-md overflow-hidden ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>
+                    <div className={`overflow-hidden rounded-md ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>
                         <Link href={route('module.kanban.card.show', { card_id: id })}>
-                        <img
-                            className="h-full w-full object-cover"
-                            src={image}
-                            alt={title}
-                            style={{
-                                aspectRatio: '1/1', // Ensures square aspect ratio
-                            }}
-                        />
-</Link>
+                            <img
+                                className="h-full w-full object-cover"
+                                src={image}
+                                alt={title}
+                                style={{
+                                    aspectRatio: '1/1', // Ensures square aspect ratio
+                                }}
+                            />
+                        </Link>
                     </div>
                 )}
             </div>
         </div>
     );
 }
-
-

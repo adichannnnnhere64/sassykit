@@ -26,7 +26,7 @@ final class ColumnCreateController extends Controller
     public function store(Request $request, CreateColumn $createColumn): RedirectResponse
     {
         $data = $request->validate([
-            'title' => ['required'],
+            'title' => ['required', 'unique:Module\Kanban\Models\Column,title'],
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
         ]);
 
@@ -63,7 +63,7 @@ final class ColumnCreateController extends Controller
         $data = $request->validate([
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
             'column_id' => 'required|string',
-            'title' => ['required'],
+            'title' => ['required', 'unique:Module\Kanban\Models\Column,title'],
         ]);
 
         $updateColumnTitle->handle($data);

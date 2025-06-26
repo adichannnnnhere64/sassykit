@@ -14,7 +14,7 @@ export default function Welcome() {
                     <FeaturesCards />
                 </section>
 
-                <section className="motion-preset-blur-up motion-duration-[2s] py-16" style={{ animationDelay: '500ms' }}>
+                <section className="motion-preset-blur-up motion-duration-[2s] mt-10  py-16" style={{ animationDelay: '500ms' }}>
                     <div className="mx-auto grid max-w-7xl grid-cols-3 gap-4 px-4 sm:px-6 lg:px-8">
                         <CardCarousel />
                         <CardCarousel />

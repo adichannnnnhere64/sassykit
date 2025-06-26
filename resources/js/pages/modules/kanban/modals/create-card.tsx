@@ -1,6 +1,6 @@
 import { close } from '@/useModal';
 import { router, useForm } from '@inertiajs/react';
-import { Button, Checkbox, Group, TextInput } from '@mantine/core';
+import { Button, Checkbox, Group, Textarea, TextInput } from '@mantine/core';
 import { FormEventHandler } from 'react';
 
 type ColumnForm = {
@@ -39,11 +39,12 @@ export default function CreateCard({column_id, board_id} : {
 
   return (
     <form onSubmit={submit}>
-      <TextInput
+      <Textarea
         withAsterisk
-        label="Title"
+        rows={10}
+        label="Content"
         autoFocus
-        placeholder="title"
+        placeholder="content"
         value={data.content}
         onChange={(e) => setData('content', e.target.value)}
         error={errors.content}
