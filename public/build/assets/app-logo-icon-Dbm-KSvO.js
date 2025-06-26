@@ -1,0 +1,1 @@
+import{j as e,aa as r}from"./ui-IMQ67UtN.js";function t(){return e.jsx(e.Fragment,{children:e.jsxs("div",{className:"dark:text-primary mr-4 flex cursor-pointer items-center text-2xl font-bold tracking-wide text-black",children:[e.jsx(r,{size:"2xl",children:"Kewlor"}),e.jsx(r,{size:"xl",c:"orange",children:"Site"})]})})}export{t as A};
