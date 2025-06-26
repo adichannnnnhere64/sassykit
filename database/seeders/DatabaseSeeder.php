@@ -43,6 +43,14 @@ final class DatabaseSeeder extends Seeder
             'password' => bcrypt('Asakaboi35'),
         ]);
 
+
+        $user = User::factory()->create([
+            'name' => 'Olaf',
+            'email' => 'olaf@kewlor.com',
+            'password' => bcrypt('olaf1234$##kewlor'),
+        ]);
+
+
         $user->assignRole('super_admin');
 
         $this->call(ShieldSeeder::class);
