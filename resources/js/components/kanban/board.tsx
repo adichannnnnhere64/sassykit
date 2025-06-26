@@ -297,7 +297,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
             </div>
             <Flex justify={'space-between'} py={'xs'}>
                 <Button onClick={() => copyAll(board?.id)}>Copy All</Button>
-                <ModalLink href={route('module.kanban.column.create', { board_id: board?.id })}>Create Column</ModalLink>
+                <ModalLink href={route('module.kanban.column.create', { board_id: board?.id })}>Create Recipe</ModalLink>
             </Flex>
 
             <DndContext
@@ -528,9 +528,9 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                             )}
                         </div>
                         <div className={`flex items-center gap-2 ${viewMode == 'horizontal' ? 'flex-wrap' : ''}`}>
-                            <ModalLink href={`${route('module.kanban.card.create', { column_id: id, board_id: board_id })}`}>Add Card</ModalLink>
+                            <ModalLink href={`${route('module.kanban.card.create', { column_id: id, board_id: board_id })}`}>Add item</ModalLink>
                             <ModalLink href={`${route('module.kanban.card.create-files', { column_id: id, board_id: board_id })}`}>
-                                Add Files
+                                Add image
                             </ModalLink>
                             <ModalLink
                                 variant="danger"

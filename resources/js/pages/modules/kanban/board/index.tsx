@@ -33,7 +33,7 @@ export default function Index({
                 data={boards}
                 buttons={
                     <>
-                        <ModalLink href={route('module.kanban.board.create')}>Create Board</ModalLink>
+                        <ModalLink href={route('module.kanban.board.create')}>Create Projects</ModalLink>
 
                     </>
                 }

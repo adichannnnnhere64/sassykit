@@ -13,6 +13,8 @@ use Inertia\Inertia;
 use Modules\Team\Models\Team;
 
 Route::get('/', function () {
+    return redirect()->route('login');
+    /* return ''; */
     return Inertia::render('index');
 })->name('home');
 

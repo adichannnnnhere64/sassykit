@@ -12,8 +12,8 @@ import type { PropsWithChildren } from 'react';
 
 const mainNavItems: NavItem[] = [
     {
-        title: 'Dashboard',
-        href: '/dashboard',
+        title: 'Recipes',
+        href: '/boards',
         icon: IconLayoutGrid,
     }
 ];
