@@ -6,7 +6,7 @@ namespace Module\Kanban\Actions;
 
 use Module\Kanban\Models\Board;
 
-final class CreateBoard
+final class UpdateBoard
 {
     public function handle(array $data)
     {
