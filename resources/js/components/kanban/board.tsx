@@ -559,7 +559,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-7">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
                                         <Card key={card.id} id={card.id} image={card.image} title={card.title} viewMode={viewMode} />
@@ -602,21 +602,27 @@ function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal'
             style={style}
             {...attributes}
             {...listeners}
-            className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:p-2 dark:text-white ${
+            className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:p-2 w-40 dark:text-white ${
                 isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
             } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square flex-col' : 'min-h-[100px]'}`}
         >
             {/* Delete button - only shows on hover */}
             {!isDragOverlay && (
-                <div className="absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                <div className="absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100 flex flex-col">
+                    <ModalLink
+                        href={route('module.kanban.card.edit', { id: id })}
+                            className="rounded-full shadow-md opacity-60 text-sm">
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="14"  height="14"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
+                    </ModalLink>
                     <ModalLink
                         variant="danger"
                         size="xs"
                         href={route('module.kanban.card.confirm-delete', { id: id })}
-                        className="rounded-full shadow-md"
+                        className="rounded-full shadow-md opacity-60 text-sm"
                     >
-                        x
+                        <svg  xmlns="http://www.w3.org/2000/svg"  width="14"  height="14"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
                     </ModalLink>
+
                 </div>
             )}
 

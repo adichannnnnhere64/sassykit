@@ -13,6 +13,7 @@ use Module\Kanban\Actions\CreateCard;
 use Module\Kanban\Actions\CreateCardFiles;
 use Module\Kanban\Actions\CreateColumn;
 use Module\Kanban\Actions\DeleteCard;
+use Module\Kanban\Actions\UpdateCard;
 use Module\Kanban\DTOs\CardData;
 use Module\Kanban\Models\Card;
 
@@ -53,7 +54,18 @@ final class CardCreateController extends Controller
         return back()->with('success', 'Card created successfully');
     }
 
+    public function update(Request $request, UpdateCard $updateCard): RedirectResponse
+    {
+        $data = $request->validate([
+            'card_id' => 'required|exists:Module\Kanban\Models\Card,id',
+            'content' => 'nullable',
+            'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
+        ]);
 
+        $updateCard->handle($data);
+
+        return back()->with('success', 'Card updated successfully')->with('board_id', $data['board_id']);
+    }
 
 
     public function destroy(Request $request, DeleteCard $deleteCard): RedirectResponse
@@ -75,6 +87,21 @@ final class CardCreateController extends Controller
 
         return Inertia::render('modules/kanban/modals/confirm-delete-card', [
             'card_id' => $data['id'],
+        ]);
+    }
+
+    public function editCard(Request $request): Response
+    {
+        $data = $request->validate([
+            'id' => 'required|exists:Module\Kanban\Models\Card,id'
+        ]);
+
+        $card = Card::with('column', 'column.board')->find($data['id']);
+
+        return Inertia::render('modules/kanban/modals/edit-card', [
+            'card_id' => $data['id'],
+            'card' => CardData::from($card),
+            'board_id' => $card->column->board->id
         ]);
     }
 

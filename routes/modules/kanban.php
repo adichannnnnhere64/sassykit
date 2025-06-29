@@ -36,11 +36,14 @@ Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
     Route::get('/create/{column_id}', [CardCreateController::class, 'create'])->name('module.kanban.card.create');
     Route::get('/create-files/{column_id}', [CardFilesController::class, 'create'])->name('module.kanban.card.create-files');
 
+    Route::get('/edit', [CardCreateController::class, 'editCard'])->name('module.kanban.card.edit');
+
     Route::get('/confirm-delete', [CardCreateController::class, 'confirmDelete'])->name('module.kanban.card.confirm-delete');
 
     Route::delete('/delete', [CardCreateController::class, 'destroy'])->name('module.kanban.card.delete');
     Route::post('/reorder-card', [BoardOrderController::class, 'update'])->name('module.kanban.card.reorder');
     Route::post('/store', [CardCreateController::class, 'store'])->name('module.kanban.card.store');
+    Route::patch('/update', [CardCreateController::class, 'update'])->name('module.kanban.card.update');
     Route::post('/storeFiles', [CardCreateController::class, 'storeFiles'])->name('module.kanban.card.store-files');
     Route::get('/show', [CardCreateController::class, 'show'])->name('module.kanban.card.show');
 });
