@@ -82,6 +82,7 @@ final class BoardCreateController extends Controller
                 $column->title => $column->cards->map(function ($card) {
                     return [
                         'id' => $card->id,
+                        'head_title' => $card->title,
                         'title' => $card->content,
                         'image' => $card->media_card,
                     ];

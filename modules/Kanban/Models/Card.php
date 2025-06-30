@@ -17,6 +17,7 @@ final class Card extends Model implements MediableInterface
     use Mediable;
 
     protected $fillable = [
+        'title',
         'content',
         'column_id',
         'position',

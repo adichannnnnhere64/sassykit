@@ -44,6 +44,7 @@ final class CardCreateController extends Controller
     public function store(Request $request, CreateCard $createCard): RedirectResponse
     {
         $data = $request->validate([
+            'title' => 'nullable',
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',
             'column_id' => 'required',
             'content' => 'required'
@@ -57,6 +58,7 @@ final class CardCreateController extends Controller
     public function update(Request $request, UpdateCard $updateCard): RedirectResponse
     {
         $data = $request->validate([
+            'title' => 'nullable',
             'card_id' => 'required|exists:Module\Kanban\Models\Card,id',
             'content' => 'nullable',
             'board_id' => 'required|exists:Module\Kanban\Models\Board,id',

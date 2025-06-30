@@ -18,6 +18,7 @@ title: string;
 export type CardData = {
 id: number;
 column: Module.Kanban.DTOs.ColumnData;
+title: string | null;
 content: string | null;
 media_card: string | null;
 media_type: string | null;

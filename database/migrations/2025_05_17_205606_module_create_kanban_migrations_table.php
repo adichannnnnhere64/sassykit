@@ -27,6 +27,7 @@ return new class extends Migration
 
         Schema::create('cards', function (Blueprint $table) {
             $table->id();
+            $table->text('title')->nullable();
             $table->text('content')->nullable();
             $table->integer('order')->default(0);
             $table->foreignId('column_id')->constrained();

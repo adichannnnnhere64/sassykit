@@ -12,7 +12,7 @@ final class UpdateCard
 {
     public function handle(array $data): Card
     {
-        $card = tap(Card::find($data['card_id']))->update(collect($data)->only('content')->toArray());
+        $card = tap(Card::find($data['card_id']))->update(collect($data)->only('content', 'title')->toArray());
         return $card;
     }
 }

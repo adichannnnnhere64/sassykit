@@ -38,7 +38,7 @@ export default function Modal({ children, show, onClose }: ModalProps) {
     return (
         <Teleport target="app">
             <div className="fixed inset-0 z-[50000] flex items-center justify-center bg-black/75" onClick={handleClickAway} data-modal-backdrop>
-                <div className="min-w-[400px] dark:bg-card relative rounded-lg bg-white py-8 px-4">
+                <div className="min-w-[700px] dark:bg-card relative rounded-lg bg-white py-8 px-4">
                     <ActionIcon variant="subtle" color="gray" className="!absolute !top-2 !right-2 pb-4" onClick={close}>
                         <IconX size={16} />
                     </ActionIcon>

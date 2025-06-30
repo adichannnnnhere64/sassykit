@@ -13,6 +13,7 @@ final class CardData extends Data
     public function __construct(
         public int $id,
         public ColumnData $column,
+        public ?string $title,
         public ?string $content,
         public ?string $media_card,
         public ?string $media_type

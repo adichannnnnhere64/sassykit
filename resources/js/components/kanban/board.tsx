@@ -229,7 +229,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                 'X-CSRF-TOKEN': csrf_token,
                 'X-Requested-With': 'XMLHttpRequest',
             },
-            body: JSON.stringify({ board_id}),
+            body: JSON.stringify({ board_id }),
             credentials: 'same-origin',
         })
             .then((res) => res.json())
@@ -239,9 +239,6 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                 });
             });
     };
-
-
-
 
     return (
         <div className="mt-8">
@@ -489,7 +486,6 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
             });
     };
 
-
     return (
         <div
             ref={setNodeRef}
@@ -559,10 +555,10 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-7">
+                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
-                                        <Card key={card.id} id={card.id} image={card.image} title={card.title} viewMode={viewMode} />
+                                        <Card head_title={card.head_title} key={card.id} id={card.id} image={card.image} title={card.title} viewMode={viewMode} />
                                     ))}
                                 </SortableContext>
                             </div>
@@ -580,7 +576,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
     );
 }
 
-function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal' }) {
+function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 'horizontal' }) {
     const { attributes, listeners, setNodeRef, transform, transition, isDragging, over } = useSortable({
         id,
         data: {
@@ -597,54 +593,88 @@ function Card({ id, title, image, isDragOverlay = false, viewMode = 'horizontal'
     };
 
     return (
-        <div
-            ref={setNodeRef}
-            style={style}
-            {...attributes}
-            {...listeners}
-            className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:p-2 w-40 dark:text-white ${
-                isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-            } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square flex-col' : 'min-h-[100px]'}`}
-        >
-            {/* Delete button - only shows on hover */}
-            {!isDragOverlay && (
-                <div className="absolute top-2 right-2 z-10 opacity-0 transition-opacity duration-200 group-hover:opacity-100 flex flex-col">
-                    <ModalLink
-                        href={route('module.kanban.card.edit', { id: id })}
-                            className="rounded-full shadow-md opacity-60 text-sm">
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="14"  height="14"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-edit"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" /><path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" /><path d="M16 5l3 3" /></svg>
-                    </ModalLink>
-                    <ModalLink
-                        variant="danger"
-                        size="xs"
-                        href={route('module.kanban.card.confirm-delete', { id: id })}
-                        className="rounded-full shadow-md opacity-60 text-sm"
-                    >
-                        <svg  xmlns="http://www.w3.org/2000/svg"  width="14"  height="14"  viewBox="0 0 24 24"  fill="none"  stroke="currentColor"  stroke-width="2"  stroke-linecap="round"  stroke-linejoin="round"  className="icon icon-tabler icons-tabler-outline icon-tabler-trash"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M4 7l16 0" /><path d="M10 11l0 6" /><path d="M14 11l0 6" /><path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" /><path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" /></svg>
-                    </ModalLink>
-
-                </div>
-            )}
-
-            {/* Card content */}
-            <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
-                <div className={`overflow-scroll text-sm font-medium ${viewMode === 'vertical' ? 'text-center' : ''}`}>{title}</div>
-
-                {image && !title && (
-                    <div className={`overflow-hidden rounded-md ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>
-                        <Link href={route('module.kanban.card.show', { card_id: id })}>
-                            <img
-                                className="h-full w-full object-cover"
-                                src={image}
-                                alt={title}
-                                style={{
-                                    aspectRatio: '1/1', // Ensures square aspect ratio
-                                }}
-                            />
-                        </Link>
+        <div>
+            <div
+                ref={setNodeRef}
+                style={style}
+                {...attributes}
+                {...listeners}
+                className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 p-2 dark:text-white ${
+                    isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
+                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square h-20 min-h-[150px] w-full flex-col' : 'min-h-[100px]'}`}
+            >
+                {/* Delete button - only shows on hover */}
+                {!isDragOverlay && (
+                    <div className="absolute top-2 right-2 z-10 flex flex-col opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <ModalLink href={route('module.kanban.card.edit', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                className="icon icon-tabler icons-tabler-outline icon-tabler-edit"
+                            >
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M7 7h-1a2 2 0 0 0 -2 2v9a2 2 0 0 0 2 2h9a2 2 0 0 0 2 -2v-1" />
+                                <path d="M20.385 6.585a2.1 2.1 0 0 0 -2.97 -2.97l-8.415 8.385v3h3l8.385 -8.415z" />
+                                <path d="M16 5l3 3" />
+                            </svg>
+                        </ModalLink>
+                        <ModalLink
+                            variant="danger"
+                            size="xs"
+                            href={route('module.kanban.card.confirm-delete', { id: id })}
+                            className="rounded-full text-sm opacity-60 shadow-md"
+                        >
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                className="icon icon-tabler icons-tabler-outline icon-tabler-trash"
+                            >
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <path d="M4 7l16 0" />
+                                <path d="M10 11l0 6" />
+                                <path d="M14 11l0 6" />
+                                <path d="M5 7l1 12a2 2 0 0 0 2 2h8a2 2 0 0 0 2 -2l1 -12" />
+                                <path d="M9 7v-3a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v3" />
+                            </svg>
+                        </ModalLink>
                     </div>
                 )}
+
+                {/* Card content */}
+                <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
+                    <div className={`overflow-scroll text-sm font-medium ${viewMode === 'vertical' ? '' : ''}`}>{title}</div>
+
+                    {image && !title && (
+                        <div className={`overflow-hidden rounded-md ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>
+                            <Link href={route('module.kanban.card.show', { card_id: id })}>
+                                <img
+                                    className="h-full w-full object-cover"
+                                    src={image}
+                                    alt={title}
+                                    style={{
+                                        aspectRatio: '1/1', // Ensures square aspect ratio
+                                    }}
+                                />
+                            </Link>
+                        </div>
+                    )}
+                </div>
             </div>
+            <h3 className="pt-1 text-xs">{head_title}</h3>
         </div>
     );
 }
