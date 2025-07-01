@@ -62,8 +62,6 @@ Route::post('/check-permission', function (Request $request) {
     }
 })->middleware(['web', 'auth'])->name('check-permission');
 
-Route::post('/copy', BoardCopyController::class)->name('board.copy');
-Route::post('/copy-all', [ BoardCopyController::class, 'copyAll' ])->name('board.copy.all');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/billings.php';

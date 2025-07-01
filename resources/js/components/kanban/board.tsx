@@ -76,6 +76,11 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
             },
             {
                 preserveScroll: true,
+                onSuccess: () => {
+                    router.visit(window.location.href, {
+                        preserveScroll: true,
+                    });
+                },
             },
         );
     };
@@ -292,8 +297,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                     </div>
                 </div>
             </div>
-            <Flex justify={'space-between'} py={'xs'}>
-                <Button onClick={() => copyAll(board?.id)}>Copy All</Button>
+            <Flex justify={'end'} py={'xs'}>
                 <ModalLink href={route('module.kanban.column.create', { board_id: board?.id })}>Create Recipe</ModalLink>
             </Flex>
 
@@ -486,11 +490,43 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
             });
     };
 
+    const duplicate = async (board_id: number, column_id: number) => {
+        await fetch(route('module.kanban.column.duplicate'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ board_id, column_id }),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then(() => {
+                router.visit(window.location.href, {
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        setTimeout(() => {
+                            const mainColumns = document.querySelectorAll('.main-column');
+                            if (mainColumns.length > 0) {
+                                const lastMainColumn = mainColumns[mainColumns.length - 1];
+                                lastMainColumn.scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'start',
+                                });
+                            }
+                        }, 100);
+                    },
+                });
+            });
+    };
+
     return (
         <div
             ref={setNodeRef}
             style={style}
-            className={`${viewMode === 'vertical' ? 'w-full' : 'w-72 flex-shrink-0'} ${isDragging ? 'ring-2 ring-blue-500' : ''}`}
+            className={`main-column ${viewMode === 'vertical' ? 'w-full' : 'w-72 flex-shrink-0'} ${isDragging ? 'ring-2 ring-blue-500' : ''}`}
             data-column-id={id}
         >
             <div className={`flex flex-col rounded-lg border border-gray-200 shadow-sm ${isDragging ? 'border-blue-300 shadow-xl' : ''} group`}>
@@ -539,6 +575,10 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 Copy
                             </Button>
 
+                            <Button variant="danger" onClick={() => duplicate(board_id, id)}>
+                                Duplicate
+                            </Button>
+
                             <span className="flex text-sm text-gray-500">{cards.length}</span>
                         </div>
                     </div>
@@ -558,7 +598,14 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                             <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
-                                        <Card head_title={card.head_title} key={card.id} id={card.id} image={card.image} title={card.title} viewMode={viewMode} />
+                                        <Card
+                                            head_title={card.head_title}
+                                            key={card.id}
+                                            id={card.id}
+                                            image={card.image}
+                                            title={card.title}
+                                            viewMode={viewMode}
+                                        />
                                     ))}
                                 </SortableContext>
                             </div>
@@ -600,9 +647,9 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 style={style}
                 {...attributes}
                 {...listeners}
-                className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 h-full p-2 dark:text-white ${
+                className={`group relative h-full cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
                     isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square   w-full flex-col' : 'min-h-[100px]'}`}
+                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square w-full flex-col' : 'min-h-[100px]'}`}
             >
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
@@ -657,7 +704,11 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
 
                 {/* Card content */}
                 <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
-                    <div className={`overflow-scroll [scrollbar-width:none] no-scrollbar [-ms-overflow-style:none] text-sm font-medium ${viewMode === 'vertical' ? '' : ''}`}>{title}</div>
+                    <div
+                        className={`no-scrollbar overflow-scroll text-sm font-medium [-ms-overflow-style:none] [scrollbar-width:none] ${viewMode === 'vertical' ? '' : ''}`}
+                    >
+                        {title}
+                    </div>
 
                     {image && !title && (
                         <div className={`overflow-hidden rounded-md ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>

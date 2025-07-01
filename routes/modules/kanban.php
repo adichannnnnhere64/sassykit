@@ -2,12 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Kanban\BoardCopyController;
 use App\Http\Controllers\Kanban\BoardCreateController;
 use App\Http\Controllers\Kanban\BoardOrderController;
 use App\Http\Controllers\Kanban\CardCreateController;
 use App\Http\Controllers\Kanban\CardFilesController;
 use App\Http\Controllers\Kanban\CardOrderController;
 use App\Http\Controllers\Kanban\ColumnCreateController;
+use App\Http\Controllers\Kanban\ColumnDuplicateController;
 use App\Http\Controllers\Kanban\ColumnOrderController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +30,8 @@ Route::group(['prefix' => 'columns', 'middleware' => 'auth'], function () {
     Route::delete('/delete', [ColumnCreateController::class, 'destroy'])->name('module.kanban.column.delete');
     Route::get('/confirm-delete', [ColumnCreateController::class, 'confirmDelete'])->name('module.kanban.column.confirm-delete');
     Route::patch('/update-title', [ColumnCreateController::class, 'updateTitle'])->name('module.kanban.column.update-title');
+
+    Route::post('/duplicate', ColumnDuplicateController::class)->name('module.kanban.column.duplicate');
 });
 
 
@@ -47,3 +51,6 @@ Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
     Route::post('/storeFiles', [CardCreateController::class, 'storeFiles'])->name('module.kanban.card.store-files');
     Route::get('/show', [CardCreateController::class, 'show'])->name('module.kanban.card.show');
 });
+
+Route::post('/copy', BoardCopyController::class)->name('board.copy');
+Route::post('/copy-all', [ BoardCopyController::class, 'copyAll' ])->name('board.copy.all');
