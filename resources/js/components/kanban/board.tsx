@@ -666,7 +666,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
 
     return (
         <div>
-            <h3 className="pb-2 text-xs font-bold">{head_title}</h3>
+            <h3 className="pb-2 text-xs font-bold">{head_title}<span className="opacity-0">.</span></h3>
             <div
                 ref={setNodeRef}
                 style={style}
