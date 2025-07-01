@@ -33,7 +33,7 @@ final class Clipboard
             ->pluck('cards')
             ->flatten()
             ->map(function ($card, $index) {
-                return $card->title."\n".$card->content;
+                return $card?->title ?? ""."\n".$card->content;
             });
 
         return $lines->implode("\n\n");
