@@ -53,4 +53,5 @@ Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
 });
 
 Route::post('/copy', BoardCopyController::class)->name('board.copy');
+Route::post('/copy-title', [ BoardCopyController::class, 'copyWithTitle' ])->name('board.copy.title');
 Route::post('/copy-all', [ BoardCopyController::class, 'copyAll' ])->name('board.copy.all');

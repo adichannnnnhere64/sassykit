@@ -490,6 +490,27 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
             });
     };
 
+
+    const copyWithTitle = async (board_id: number, column_id: number) => {
+        await fetch(route('board.copy.title'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ board_id, column_id }),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then((data) => {
+                navigator.clipboard.writeText(data.clipboard).then(() => {
+                    alert('Copied to clipboard');
+                });
+            });
+    };
+
     const duplicate = async (board_id: number, column_id: number) => {
         await fetch(route('module.kanban.column.duplicate'), {
             method: 'POST',
@@ -575,6 +596,10 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 Copy
                             </Button>
 
+                            <Button variant="danger" onClick={() => copyWithTitle(board_id, id)}>
+                                Copy w/ Title
+                            </Button>
+
                             <Button variant="danger" onClick={() => duplicate(board_id, id)}>
                                 Duplicate
                             </Button>
@@ -647,7 +672,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 style={style}
                 {...attributes}
                 {...listeners}
-                className={`group relative min-h-[150px] h-[200px] cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
+                className={`group relative min-h-[150px]  max-h-[200px] cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
                     isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
                 } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square w-full flex-col' : 'min-h-[100px]'}`}
             >
