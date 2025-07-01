@@ -545,7 +545,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                 </div>
 
                 {!isCollapsed && (
-                    <div className="group-hog-blue-50/20 relative min-h-[200px] flex-grow p-4">
+                    <div className="group-hog-blue-50/20 relative flex-grow p-4 pb-12">
                         {viewMode === 'horizontal' ? (
                             <SortableContext items={cards.map((card) => card.id)} strategy={verticalListSortingStrategy}>
                                 <div className="space-y-3">
@@ -594,14 +594,15 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
 
     return (
         <div>
+            <h3 className="pb-2 text-xs font-bold">{head_title}</h3>
             <div
                 ref={setNodeRef}
                 style={style}
                 {...attributes}
                 {...listeners}
-                className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 p-2 dark:text-white ${
+                className={`group relative cursor-grab rounded-lg border border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 h-full p-2 dark:text-white ${
                     isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square h-20 min-h-[150px] w-full flex-col' : 'min-h-[100px]'}`}
+                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square   w-full flex-col' : 'min-h-[100px]'}`}
             >
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
@@ -656,7 +657,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
 
                 {/* Card content */}
                 <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
-                    <div className={`overflow-scroll text-sm font-medium ${viewMode === 'vertical' ? '' : ''}`}>{title}</div>
+                    <div className={`overflow-scroll [scrollbar-width:none] no-scrollbar [-ms-overflow-style:none] text-sm font-medium ${viewMode === 'vertical' ? '' : ''}`}>{title}</div>
 
                     {image && !title && (
                         <div className={`overflow-hidden rounded-md ${viewMode === 'vertical' ? 'flex-grow' : 'h-32'}`}>
@@ -674,7 +675,6 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                     )}
                 </div>
             </div>
-            <h3 className="pt-1 text-xs">{head_title}</h3>
         </div>
     );
 }

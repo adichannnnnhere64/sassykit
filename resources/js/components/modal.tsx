@@ -29,7 +29,7 @@ export default function Modal({ children, show, onClose }: ModalProps) {
         if (e.target instanceof Element && e.target.hasAttribute('data-modal-backdrop') && onClose) {
             e.preventDefault();
             e.stopPropagation();
-            onClose();
+            // onClose();
         }
     };
 
