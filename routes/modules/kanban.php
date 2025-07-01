@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Http\Controllers\Kanban\BoardCopyController;
 use App\Http\Controllers\Kanban\BoardCreateController;
 use App\Http\Controllers\Kanban\BoardOrderController;
+use App\Http\Controllers\Kanban\BoardPasteGenerator;
 use App\Http\Controllers\Kanban\CardCreateController;
 use App\Http\Controllers\Kanban\CardFilesController;
 use App\Http\Controllers\Kanban\CardOrderController;
@@ -55,3 +56,7 @@ Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
 Route::post('/copy', BoardCopyController::class)->name('board.copy');
 Route::post('/copy-title', [ BoardCopyController::class, 'copyWithTitle' ])->name('board.copy.title');
 Route::post('/copy-all', [ BoardCopyController::class, 'copyAll' ])->name('board.copy.all');
+
+Route::post('/paste-generator',  BoardPasteGenerator::class)->name('board.generate');
+
+Route::get('/board-generate/{id}/{column_id}', [BoardPasteGenerator::class, 'generate'])->name('module.kanban.board.generate');

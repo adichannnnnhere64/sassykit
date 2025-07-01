@@ -297,7 +297,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                     </div>
                 </div>
             </div>
-            <Flex justify={'end'} py={'xs'}>
+            <Flex justify={'end'} py={'xs'} gap='xs'>
                 <ModalLink href={route('module.kanban.column.create', { board_id: board?.id })}>Create Recipe</ModalLink>
             </Flex>
 
@@ -603,6 +603,8 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                             <Button variant="danger" onClick={() => duplicate(board_id, id)}>
                                 Duplicate
                             </Button>
+
+                <ModalLink  href={route('module.kanban.board.generate', { id: board_id, column_id: id })}>Paste</ModalLink>
 
                             <span className="flex text-sm text-gray-500">{cards.length}</span>
                         </div>
