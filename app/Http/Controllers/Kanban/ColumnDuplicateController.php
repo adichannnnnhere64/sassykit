@@ -21,6 +21,8 @@ final class ColumnDuplicateController extends Controller
         $board = Board::findOrFail($data['board_id']);
         $column = $board->columns()->where('title', $data['column_id'])->firstOrFail();
 
+        $lastColumnOrder = $board->columns()->orderByDesc('order')->first()->order + 1;
+
         // Generate a unique title
         $newTitle = $this->generateUniqueTitle($board, $column->title);
 
@@ -28,6 +30,7 @@ final class ColumnDuplicateController extends Controller
         $newColumn = $column->replicate();
         $newColumn->board_id = $board->id;
         $newColumn->title = $newTitle;
+        $newColumn->order = $lastColumnOrder;
         $newColumn->save();
 
         // Duplicate the cards
