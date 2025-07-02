@@ -52,7 +52,7 @@
         @endphp
         @vite(['resources/js/app.tsx', "app-modules/$moduleLower/resources/js/pages/$path.tsx"])
     @else
-        @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
+        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
     @endif
 
 
