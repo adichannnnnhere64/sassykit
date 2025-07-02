@@ -40,7 +40,22 @@
 
     @routes
     @viteReactRefresh
-    @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.tsx"])
+
+
+    @if (count(explode('::', $page['component'])) > 1)
+        @php
+            $module = explode('::', $page['component'])[0];
+
+            $moduleLower = strtolower($module);
+
+            $path = explode('::', $page['component'])[1];
+        @endphp
+        @vite(['resources/js/app.tsx', "app-modules/$moduleLower/resources/js/pages/$path.tsx"])
+    @else
+        @vite(['resources/js/app.tsx', "resources/js/Pages/{$page['component']}.tsx"])
+    @endif
+
+
     @inertiaHead
 </head>
 
