@@ -34,14 +34,16 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                         }}
                         rightSection={variant == 'sidebar' && !collapsed && <IconSelector color="var(--foreground)" size={20} />}
                     >
-                        <UserInfo user={auth.user} showName={variant == 'sidebar' && !collapsed} />
+                       {auth?.user &&  <UserInfo user={auth?.user} showName={variant == 'sidebar' && !collapsed} />}
                     </SidebarMenuButton>
                 </Menu.Target>
 
                 <Menu.Dropdown className="border-border border-2">
+                    { auth?.user &&
                     <Menu.Label>
-                        <UserInfo user={auth.user} showEmail={true} />
+                        <UserInfo user={auth?.user} showEmail={true} />
                     </Menu.Label>
+}
 
                     <Menu.Divider />
                     <Menu.Item component={Link} href={route('billings.overview')} leftSection={<IconMoneybag color="gray" size={20} />}>
@@ -52,9 +54,8 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                         Settings
                     </Menu.Item>
 
-                    {console.log(module)}
 
-                    {module?.has_team && (
+                    {(module?.has_team && auth.user) && (
                         <>
                             <span className="pl-3 text-muted-foreground text-xs">
                             Teams
@@ -81,7 +82,7 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                 </Menu.Dropdown>
             </Menu>
 
-            { module.has_team &&
+            { (module?.has_team && auth.user) &&
             <Menu shadow="md" width={230} position={variant === 'header' ? 'bottom-end' : collapsed ? 'right-end' : 'top-start'}>
                 <Menu.Target>
                     <SidebarMenuButton
@@ -107,14 +108,14 @@ export function NavUser({ variant, collapsed = false }: { variant: 'header' | 's
                     {console.log(module.team)}
 
 
-                    {module?.has_team && (
+                    {(module?.has_team && auth.user)  && (
   <>
     {module.team?.teams.length > 0 ? (
       module.team?.teams.map((team) => (
         <Menu.Item key={team.id} component={Link} href={route('module.team.set-current', team.id)} method='patch' >
                                         <span className="flex items-center !space-x-2">
 
-          <span className="truncate">{team.name}</span> { module.team.current_team.id === team.id && <IconCheck size={14} /> }
+          <span className="truncate">{team?.name}</span> { module.team.current_team.id === team.id && <IconCheck size={14} /> }
                                         </span>
         </Menu.Item>
       ))

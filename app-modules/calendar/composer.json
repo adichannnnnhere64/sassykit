@@ -1,0 +1,24 @@
+{
+	"name": "modules/calendar",
+	"description": "",
+	"type": "library",
+	"version": "1.0",
+	"license": "proprietary",
+	"require": {},
+	"autoload": {
+		"psr-4": {
+			"Modules\\Calendar\\": "src/",
+			"Modules\\Calendar\\Tests\\": "tests/",
+			"Modules\\Calendar\\Database\\Factories\\": "database/factories/",
+			"Modules\\Calendar\\Database\\Seeders\\": "database/seeders/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Modules\\Calendar\\Providers\\CalendarServiceProvider"
+			]
+		}
+	}
+}

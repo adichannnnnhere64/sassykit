@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3f69fbfdaf478ea1db93d53db5c43a2d",
+    "content-hash": "4628f2108c6c30d9ed0e7d7b283ec2d5",
     "packages": [
         {
             "name": "amphp/amp",
@@ -6411,6 +6411,38 @@
                 }
             ],
             "time": "2023-11-07T21:57:25+00:00"
+        },
+        {
+            "name": "modules/calendar",
+            "version": "1.0",
+            "dist": {
+                "type": "path",
+                "url": "app-modules/calendar",
+                "reference": "4b7c7ba784ff12d4a43f95c2fed9054301af0d12"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "providers": [
+                        "Modules\\Calendar\\Providers\\CalendarServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Modules\\Calendar\\": "src/",
+                    "Modules\\Calendar\\Tests\\": "tests/",
+                    "Modules\\Calendar\\Database\\Factories\\": "database/factories/",
+                    "Modules\\Calendar\\Database\\Seeders\\": "database/seeders/"
+                }
+            },
+            "license": [
+                "proprietary"
+            ],
+            "transport-options": {
+                "symlink": true,
+                "relative": true
+            }
         },
         {
             "name": "modules/media",

@@ -111,7 +111,8 @@
         "paths": {
             "@/*": ["./resources/js/*"],
             "ziggy-js": ["./vendor/tightenco/ziggy"],
-            "@team/*": ["./app-modules/team/resources/js/*"]
+            "@team/*": ["./app-modules/team/resources/js/*"],
+            "@calendar/*": ["./app-modules/calendar/resources/js/*"]
         },
         "jsx": "react-jsx"
     },
