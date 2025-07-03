@@ -15,4 +15,8 @@ use Illuminate\Support\Facades\Route;
 use Modules\Calendar\Http\Controllers\CalendarController as ControllersCalendarController;
 use Modules\Team\Http\Controllers\CalendarController;
 
+Route::middleware(['web', 'auth'])->group(function () {
 Route::get('/calendars', [ ControllersCalendarController::class, 'index' ] );
+
+});
+
