@@ -1,0 +1,25 @@
+{
+	"name": "modules/setting",
+	"description": "",
+	"type": "library",
+	"version": "1.0",
+	"license": "proprietary",
+	"require": {
+    },
+	"autoload": {
+		"psr-4": {
+			"Modules\\Setting\\": "src/",
+			"Modules\\Setting\\Tests\\": "tests/",
+			"Modules\\Setting\\Database\\Factories\\": "database/factories/",
+			"Modules\\Setting\\Database\\Seeders\\": "database/seeders/"
+		}
+	},
+	"minimum-stability": "stable",
+	"extra": {
+		"laravel": {
+			"providers": [
+				"Modules\\Setting\\Providers\\SettingServiceProvider"
+			]
+		}
+	}
+}

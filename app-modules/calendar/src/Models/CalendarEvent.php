@@ -6,6 +6,7 @@ namespace Modules\Calendar\Models;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 final class CalendarEvent extends Model
 {
@@ -22,8 +23,10 @@ final class CalendarEvent extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function category()
+    public function categories(): BelongsToMany
     {
-        return $this->belongsTo(CalendarCategory::class);
+        return $this->belongsToMany(CalendarCategory::class, 'calendar_event_categories')
+            ->withTimestamps();
     }
+
 }

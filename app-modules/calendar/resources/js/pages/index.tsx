@@ -1,17 +1,17 @@
 import AppLayout from '@/layouts/app-layout';
-import { Stack, Group, Badge, Title, Paper, Button, Modal, TextInput, MultiSelect, Text } from '@mantine/core';
-import { IconDownload } from '@tabler/icons-react';
+import { open } from '@/useModal';
+import { router, usePage } from '@inertiajs/react';
+import { Badge, Button, Flex, Group, Modal, MultiSelect, Paper, Stack, Text, TextInput } from '@mantine/core';
 import format from 'date-fns/format';
 import getDay from 'date-fns/getDay';
 import enUS from 'date-fns/locale/en-US';
 import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
 import 'react-big-calendar/lib/addons/dragAndDrop/styles.scss';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import axios from 'axios';
 
 const locales = {
     'en-US': enUS,
@@ -57,26 +57,22 @@ const DEFAULT_CATEGORIES: Category[] = [
     { name: 'travel', color: '#20c997' },
 ];
 
-export default function CalendarPage({
-    defaultCategories = DEFAULT_CATEGORIES,
-    defaultEvents = [],
-    defaultColor = '#5c6bc0'
-}: CalendarPageProps) {
+export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, defaultEvents = [], defaultColor = '#5c6bc0' }: CalendarPageProps) {
     const [categories] = useState<Category[]>(defaultCategories);
     const [events, setEvents] = useState<Event[]>(
-        defaultEvents.map(event => ({
+        defaultEvents.map((event) => ({
             ...event,
             start: new Date(event.start),
             end: new Date(event.end),
             categories: event.categories || [],
-        }))
+        })),
     );
 
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [currentView, setCurrentView] = useState<Views>(Views.WEEK);
+    const [currentView, setCurrentView] = useState<Views>(Views.MONTH);
 
     // Modal state
-  const [modalOpened, setModalOpened] = useState(false);
+    const [modalOpened, setModalOpened] = useState(false);
     const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
     const [newEventTitle, setNewEventTitle] = useState('');
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -96,15 +92,28 @@ export default function CalendarPage({
             setEvents((prev) => {
                 const existing = prev.find((ev) => ev.id === event.id) ?? {};
                 const filtered = prev.filter((ev) => ev.id !== event.id);
-                return [...filtered, {
-                    ...existing,
-                    start,
-                    end,
-                    allDay: event.allDay
-                }];
+                return [
+                    ...filtered,
+                    {
+                        ...existing,
+                        start,
+                        end,
+                        allDay: event.allDay,
+                    },
+                ];
             });
+
+            router.put(
+                route('calendar.update-time', event.id),
+                { start, end },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                },
+            );
         },
-        [setEvents]
+
+        [setEvents],
     );
 
     const handleEventResize = useCallback(
@@ -114,31 +123,55 @@ export default function CalendarPage({
                 const filtered = prev.filter((ev) => ev.id !== event.id);
                 return [...filtered, { ...existing, start, end }];
             });
+
+            router.put(
+                route('calendar.update-time', event.id),
+                { start, end },
+                {
+                    preserveScroll: true,
+                    preserveState: true,
+                },
+            );
+
         },
-        [setEvents]
+        [setEvents],
+
+
+
     );
 
+    const { version } = usePage();
     const handleSelectSlot = (slotInfo) => {
         setSlotInfo(slotInfo);
         setCurrentEvent(null);
-        setNewEventTitle('');
-        setSelectedCategories([]);
-        setModalOpened(true);
+        open(
+            route('calendar.create-modal', {
+                start: slotInfo.start,
+                end: slotInfo.end,
+                id: slotInfo.id
+            }),
+            version ?? '',
+        );
     };
 
     const handleSelectEvent = (event) => {
         setCurrentEvent(event);
         setNewEventTitle(event.title);
-        setSelectedCategories(event.categories.map(c => c.name));
-        setModalOpened(true);
+        setSelectedCategories(event.categories.map((c) => c.name));
+        open(
+            route('calendar.create-modal', {
+                start: event.start,
+                end: event.end,
+                id: event.id
+            }),
+            version ?? '',
+        );
     };
 
     const handleSaveEvent = () => {
         if (!newEventTitle.trim()) return;
 
-        const selectedCategoryObjects = categories.filter(cat =>
-            selectedCategories.includes(cat.name)
-        );
+        const selectedCategoryObjects = categories.filter((cat) => selectedCategories.includes(cat.name));
 
         if (currentEvent) {
             // Update existing event
@@ -147,7 +180,7 @@ export default function CalendarPage({
                 title: newEventTitle,
                 categories: selectedCategoryObjects,
             };
-            setEvents(prev => prev.map(evt => (evt.id === currentEvent.id ? updatedEvent : evt)));
+            setEvents((prev) => prev.map((evt) => (evt.id === currentEvent.id ? updatedEvent : evt)));
         } else {
             // Create new event
             const newEvent: Event = {
@@ -159,7 +192,7 @@ export default function CalendarPage({
                 categories: selectedCategoryObjects,
                 status: 'pending',
             };
-            setEvents(prev => [...prev, newEvent]);
+            setEvents((prev) => [...prev, newEvent]);
         }
 
         setModalOpened(false);
@@ -167,7 +200,7 @@ export default function CalendarPage({
 
     const handleDeleteEvent = () => {
         if (currentEvent) {
-            setEvents(prev => prev.filter(evt => evt.id !== currentEvent.id));
+            setEvents((prev) => prev.filter((evt) => evt.id !== currentEvent.id));
             setModalOpened(false);
         }
     };
@@ -180,31 +213,31 @@ export default function CalendarPage({
         setCurrentView(view);
     };
 
-    const handleSaveCalendar = async () => {
-        try {
-            await axios.post('/api/calendar/save', {
-                currentDate: currentDate.toISOString(),
-                currentView,
-                events: events.map(event => ({
-                    ...event,
-                    start: event.start.toISOString(),
-                    end: event.end.toISOString(),
-                    categories: event.categories
-                }))
-            });
-            alert('Current events saved successfully!');
-        } catch (error) {
-            alert('Error saving calendar');
-            console.error(error);
-        }
-    };
+    // const handleSaveCalendar = async () => {
+    //     try {
+    //         await axios.post('/api/calendar/save', {
+    //             currentDate: currentDate.toISOString(),
+    //             currentView,
+    //             events: events.map(event => ({
+    //                 ...event,
+    //                 start: event.start.toISOString(),
+    //                 end: event.end.toISOString(),
+    //                 categories: event.categories
+    //             }))
+    //         });
+    //         alert('Current events saved successfully!');
+    //     } catch (error) {
+    //         alert('Error saving calendar');
+    //         console.error(error);
+    //     }
+    // };
 
     const eventPropGetter = (event: Event) => {
         return {
             style: {
-                backgroundColor: defaultColor,
+                backgroundColor: event?.color || defaultColor,
                 borderRadius: '4px',
-                border: `2px solid ${defaultColor}`,
+                // border: `2px solid ${defaultColor}`,
                 color: 'white',
                 fontSize: '12px',
                 textDecoration: event.status === 'completed' ? 'line-through' : 'none',
@@ -218,7 +251,7 @@ export default function CalendarPage({
                 <strong>{event.title}</strong>
                 {event.categories?.length > 0 && (
                     <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
-                        {event.categories.map(category => (
+                        {event.categories.map((category) => (
                             <span
                                 key={category.name}
                                 style={{
@@ -239,21 +272,35 @@ export default function CalendarPage({
         );
     };
 
+    useEffect(() => {
+        setEvents(
+            defaultEvents.map((event) => ({
+                ...event,
+                start: new Date(event.start),
+                end: new Date(event.end),
+                categories: event.categories || [],
+            })),
+        );
+    }, [defaultEvents]);
+
     return (
         <AppLayout>
             <Stack spacing="lg">
-                <Group position="apart">
+                <Flex justify="space-between" align="center" items="end" position="apart">
                     <Paper p="md" withBorder>
-                        <Title order={5} mb="sm">Category Color Key</Title>
+                        <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create'), version ?? '', 'xs')}>
+                            Add Category
+                        </Button>
+
                         <Group spacing="sm">
-                            {categories.map(category => (
+                            {categories.map((category) => (
                                 <Badge
                                     key={category.name}
                                     variant="filled"
                                     style={{
                                         backgroundColor: category.color,
                                         color: 'white',
-                                        textTransform: 'capitalize'
+                                        textTransform: 'capitalize',
                                     }}
                                 >
                                     {category.name}
@@ -261,15 +308,20 @@ export default function CalendarPage({
                             ))}
                         </Group>
                     </Paper>
-
-                    <Button
-                        onClick={handleSaveCalendar}
-                        variant="outline"
-                        leftIcon={<IconDownload size={16} />}
-                    >
-                        Save Current Events
-                    </Button>
-                </Group>
+                    <div>
+                        <Button
+                            size="xs"
+                            onClick={() =>
+                                open(
+                                    route('calendar.create-modal', { start: currentDate.toISOString(), end: currentDate.toISOString() }),
+                                    version ?? '',
+                                )
+                            }
+                        >
+                            Add Event
+                        </Button>
+                    </div>
+                </Flex>
 
                 <DnDCalendar
                     localizer={localizer}
@@ -298,62 +350,10 @@ export default function CalendarPage({
                     draggableAccessor={() => true}
                     eventPropGetter={eventPropGetter}
                     components={{
-                        event: eventComponent
+                        event: eventComponent,
                     }}
                 />
 
-                {/* Event Modal */}
-                <Modal
-                    opened={modalOpened}
-                    onClose={() => setModalOpened(false)}
-                    title={currentEvent ? "Edit Event" : "Create New Event"}
-                    size="md"
-                >
-                    <Stack spacing="md">
-                        <TextInput
-                            label="Event Title"
-                            value={newEventTitle}
-                            onChange={(e) => setNewEventTitle(e.currentTarget.value)}
-                            placeholder="Enter event title"
-                            required
-                        />
-
-                        <MultiSelect
-                            label="Categories"
-                            data={categories.map(c => ({ value: c.name, label: c.name }))}
-                            value={selectedCategories}
-                            onChange={setSelectedCategories}
-                            placeholder="Select categories"
-                            searchable
-                            clearable
-                        />
-
-                        {currentEvent && (
-                            <Text size="sm" color="dimmed">
-                                {currentEvent.allDay ? "All day event" :
-                                    `From ${currentEvent.start.toLocaleString()} to ${currentEvent.end.toLocaleString()}`}
-                            </Text>
-                        )}
-
-                        <Group position="right" spacing="sm">
-                            {currentEvent && (
-                                <Button
-                                    color="red"
-                                    variant="outline"
-                                    onClick={handleDeleteEvent}
-                                >
-                                    Delete
-                                </Button>
-                            )}
-                            <Button
-                                onClick={handleSaveEvent}
-                                disabled={!newEventTitle.trim()}
-                            >
-                                {currentEvent ? "Update" : "Create"}
-                            </Button>
-                        </Group>
-                    </Stack>
-                </Modal>
             </Stack>
         </AppLayout>
     );

@@ -12,13 +12,14 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Storage;
 use Laravel\Cashier\Billable;
+use Modules\Setting\Traits\HasSettings;
 use SocialiteUi\Concerns\HasSocialAccounts;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Traits\HasRoles;
 
 final class User extends Authenticatable implements FilamentUser, HasAvatar
 {
-    use Billable, HasRoles;
+    use Billable, HasRoles, HasSettings;
 
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, HasSocialAccounts, Notifiable;

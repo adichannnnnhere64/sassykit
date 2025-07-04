@@ -7,7 +7,7 @@ import { NavItem, type BreadcrumbItem } from '@/types';
 import { Link } from '@inertiajs/react';
 import { AppShell, Burger, Button, Group } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
-import { Icon, IconBook, IconFolder, IconLayoutGrid, IconSearch } from '@tabler/icons-react';
+import { Icon, IconBook, IconCalendar, IconFolder, IconLayoutGrid, IconSearch } from '@tabler/icons-react';
 import type { PropsWithChildren } from 'react';
 
 const mainNavItems: NavItem[] = [
@@ -53,13 +53,16 @@ export default function AppHeaderLayout({ children, breadcrumbs }: PropsWithChil
                     </Group>
                     <div className="flex h-full items-center gap-x-2">
                         <HeaderMenuButton
-                            tooltip="Search"
+                            tooltip="Calendar"
+                            component={Link}
                             classNames={{
                                 root: 'bg-transparent! hover:bg-muted! px-2! hidden! md:block!',
                             }}
+                            href={route('calendar')}
                         >
-                            <IconSearch color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
+                            <IconCalendar color="var(--foreground)" className="!size-5 opacity-80 group-hover:opacity-100" />
                         </HeaderMenuButton>
+
                         {footerNavItems.map((item) => (
                             <HeaderMenuButton
                                 key={item.href}

@@ -21,11 +21,14 @@ export default function ModalContainer() {
     };
 
     return (
-        <Modal show={state.show} onClose={handleClose}>
-            <Suspense fallback={<div>Loading.</div>}>
+        <Modal
+            show={state.show}
+            onClose={handleClose}
+            size={state.size} // Pass the size from modal state
+        >
+            <Suspense fallback={<div>Loading...</div>}>
                 <Component {...state.props} />
             </Suspense>
         </Modal>
     );
 }
-

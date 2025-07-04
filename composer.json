@@ -24,6 +24,7 @@
         "leandrocfe/filament-apex-charts": "^3.1",
         "modules/calendar": "*",
         "modules/media": "*",
+        "modules/setting": "*",
         "modules/tag": "*",
         "modules/team": "*",
         "modules/upvote": "*",

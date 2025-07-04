@@ -16,5 +16,6 @@ final class CalendarCategoryData extends Data
         public int $id,
         public string $name,
         public string $color,
+        public int $user_id
     ) {}
 }

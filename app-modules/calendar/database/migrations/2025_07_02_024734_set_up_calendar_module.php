@@ -23,26 +23,33 @@ return new class() extends Migration {
         Schema::create('calendar_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('category_id')->nullable()->constrained('calendar_categories')->onDelete('set null');
             $table->string('title');
             $table->text('description')->nullable();
             $table->dateTime('start');
             $table->dateTime('end');
             $table->boolean('all_day')->default(false);
-            /* $table->enum('priority', ['low', 'medium', 'high']); */
-            /* $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending'); */
             $table->string('location')->nullable();
-            $table->string('color_override')->nullable(); // Allows custom color per event
+            $table->string('color')->nullable(); // Allows custom color per event
             $table->timestamps();
             $table->softDeletes();
 
             $table->index(['user_id', 'start']); // For faster user-specific date queries
         });
 
+        // Event Categories Pivot Table
+        Schema::create('calendar_event_categories', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('calendar_event_id')->constrained('calendar_events')->onDelete('cascade');
+            $table->foreignId('calendar_category_id')->constrained('calendar_categories')->onDelete('cascade');
+            $table->timestamps();
+
+            $table->unique(['calendar_event_id', 'calendar_category_id']); // Prevent duplicate category assignments
+        });
+
         // Optional: Recurring Events Pattern Table
         Schema::create('calendar_event_recurrences', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('event_id')->constrained('calendar_events')->onDelete('cascade');
+            $table->foreignId('calendar_event_id')->constrained('calendar_events')->onDelete('cascade');
             $table->string('recurrence_pattern'); // e.g., 'daily', 'weekly', 'monthly'
             $table->json('recurrence_data')->nullable(); // For complex recurrence rules
             $table->dateTime('end_date')->nullable();
@@ -53,6 +60,7 @@ return new class() extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('calendar_event_recurrences');
+        Schema::dropIfExists('calendar_event_categories');
         Schema::dropIfExists('calendar_events');
         Schema::dropIfExists('calendar_categories');
     }
