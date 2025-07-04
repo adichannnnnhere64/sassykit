@@ -30,4 +30,7 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/calendar/{model}', [ControllersCalendarController::class, 'update'])->name('calendar.update');
     Route::put('/calendar/{model}/time', [ControllersCalendarController::class, 'updateTime'])->name('calendar.update-time');
 
+    Route::delete('/calendar/{model}', [ControllersCalendarController::class, 'destroy'])->name('calendar.destroy');
+
+
 });

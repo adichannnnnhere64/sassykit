@@ -20,7 +20,6 @@ final class CalendarController
         /* $theme = auth()->user()->getSetting('theme', 'light'); */
         // Define color mappings (could also come from database)
 
-
         /* auth()->user()->calendarCategories()->create([ */
         /* 'name' => 'tubol', */
         /* 'color' => 'pink', */
@@ -55,17 +54,19 @@ final class CalendarController
             'start' => 'required|date',
             'end' => 'required|date',
             'id' => 'nullable',
+            'create' => 'nullable',
         ]);
         /* dd($data); */
 
         $id = @$data['id'];
+        $create = @$data['create'];
         $start_time = Carbon::parse($data['start'])->format('H:i:s');
         $end_time = Carbon::parse($data['end'])->format('H:i:s');
 
         $start_date = Carbon::parse($data['start'])->format('Y-m-d');
         $end_date = Carbon::parse($data['end'])->format('Y-m-d');
 
-        if ($id == null) {
+        if ($create) {
             $start_time = now()->format('H:i:s');
             $end_time = now()->addHour()->format('H:i:s');
 
@@ -118,12 +119,12 @@ final class CalendarController
     {
         $data = $request->validate([
             'title' => 'required',
-            'description' => 'required',
+            'description' => 'nullable',
             'start' => 'required',
             'end' => 'required',
             'start_date' => 'required|date',
             'end_date' => 'required|date',
-            'categories' => 'required|array',
+            'categories' => 'array|nullable',
             'color' => 'required',
         ]);
 
@@ -198,6 +199,15 @@ final class CalendarController
 
         return redirect()->back()->with([
             'message' => 'Event updated successfully',
+        ]);
+    }
+
+    public function destroy(CalendarEvent $model)
+    {
+        $model->delete();
+
+        return redirect()->back()->with([
+            'message' => 'Event deleted successfully',
         ]);
     }
 }

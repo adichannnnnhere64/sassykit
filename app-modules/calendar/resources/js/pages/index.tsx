@@ -288,7 +288,9 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
             <Stack spacing="lg">
                 <Flex justify="space-between" align="center" items="end" position="apart">
                     <Paper p="md" withBorder>
-                        <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create'), version ?? '', 'xs')}>
+                        <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create', {
+                            create: true
+                        }), version ?? '', 'xs')}>
                             Add Category
                         </Button>
 

@@ -1,6 +1,6 @@
 import MultiSelectCombobox from '@/components/pills-input';
 import { close } from '@/useModal';
-import { useForm } from '@inertiajs/react';
+import { router, useForm } from '@inertiajs/react';
 import { Button, ColorInput, Group, Textarea, TextInput } from '@mantine/core';
 import { DateInput, TimePicker } from '@mantine/dates';
 import '@mantine/dates/styles.css';
@@ -40,7 +40,6 @@ export default function CreateEvent({
         color: color ?? '#2e2e2e',
     });
 
-
     // const categories = [
     //     { value: '1', label: '🍎 Apples' },
     //     { value: '2', label: '🍌 Bananas' },
@@ -50,6 +49,18 @@ export default function CreateEvent({
     // ];
 
     // console.log(categories, defaultCategories)
+    //
+
+    const handleDeleteEvent = (e) => {
+        e.preventDefault();
+        router.delete(route('calendar.destroy', { id }), {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                close();
+            },
+        });
+    };
 
     const submitHandler: FormEventHandler = (e) => {
         e.preventDefault();
@@ -75,7 +86,7 @@ export default function CreateEvent({
     return (
         <>
             <form onSubmit={submitHandler} className="space-y-3">
-                <TextInput label="Title" autoFocus value={data.title} onChange={(e) => setData('title', e.target.value)} />
+                <TextInput required label="Title" autoFocus value={data.title} onChange={(e) => setData('title', e.target.value)} />
                 <Textarea label="Description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
 
                 <DateInput
@@ -120,6 +131,11 @@ export default function CreateEvent({
 
                 <Group justify="flex-end" mt="md">
                     <Button type="submit">Submit</Button>
+                    {id && (
+                        <Button onClick={handleDeleteEvent} className="!border-red-500 !text-red-500" variant="outline">
+                            Delete
+                        </Button>
+                    )}
                 </Group>
             </form>
         </>
