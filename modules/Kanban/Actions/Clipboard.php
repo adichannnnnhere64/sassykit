@@ -22,18 +22,17 @@ final class Clipboard
     {
         $board = Board::find($data['board_id']);
 
-        return implode("\n\n", $board->columns->pluck('cards')->flatten()->pluck('content')->toArray());
+        return implode("\n\n", $board->columns()->where('title', $data['column_id'])
+            ->pluck('cards')->flatten()->pluck('content')->toArray());
     }
 
     public function copyWithTitle(array $data)
     {
         $board = Board::findOrFail($data['board_id']);
-
-        $lines = $board->columns
-            ->pluck('cards')
-            ->flatten()
+        $lines =  $board->columns()->where('title', $data['column_id'])->first()->cards
             ->map(function ($card, $index) {
-                $title =  $card?->title ?? "";
+                $title = $card?->title ?? '';
+
                 return $title."\n".$card->content;
             });
 
