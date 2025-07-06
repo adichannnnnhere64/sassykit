@@ -622,7 +622,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid grid-cols-2 gap-8 sm:grid-cols-2">
+                            <div className="grid grid-cols-2 gap-8 sm:grid-cols-1">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
                                         <Card
