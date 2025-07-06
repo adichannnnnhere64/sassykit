@@ -95,9 +95,7 @@ export default function Login({ status, canResetPassword, socialiteUi }: LoginPr
                     </Button>
                 </div>
 
-                <Socialite socialiteUi={socialiteUi} />
-
-
+                {socialiteUi.providers.length > 0 && <Socialite socialiteUi={socialiteUi} />}
             </form>
 
             {status && <div className="mb-4 text-center text-sm font-medium text-green-600">{status}</div>}
