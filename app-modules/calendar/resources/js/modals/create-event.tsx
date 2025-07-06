@@ -17,6 +17,7 @@ export default function CreateEvent({
     description,
     userCategories,
     color = '#2e2e2e',
+    amount = ""
 }: {
     start_time: string;
     end_time: string;
@@ -28,6 +29,7 @@ export default function CreateEvent({
     description?: string;
     userCategories?: [];
     color: string;
+    amount: string
 }) {
     const { data, setData, post, put } = useForm({
         start: start_time,
@@ -38,6 +40,7 @@ export default function CreateEvent({
         description: description,
         categories: userCategories,
         color: color ?? '#2e2e2e',
+        amount: amount
     });
 
     // const categories = [
@@ -87,6 +90,8 @@ export default function CreateEvent({
         <>
             <form onSubmit={submitHandler} className="space-y-3">
                 <TextInput required label="Title" autoFocus value={data.title} onChange={(e) => setData('title', e.target.value)} />
+
+                <TextInput required label="Amount" autoFocus value={data.amount} onChange={(e) => setData('amount', e.target.value)} />
                 <Textarea label="Description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
 
                 <DateInput
@@ -130,12 +135,13 @@ export default function CreateEvent({
                 />
 
                 <Group justify="flex-end" mt="md">
-                    <Button type="submit">Submit</Button>
                     {id && (
-                        <Button onClick={handleDeleteEvent} className="!border-red-500 !text-red-500" variant="outline">
+                        <Button onClick={() => window.confirm('Are you sure you want to delete this event?') && handleDeleteEvent} className="!border-red-500 !text-red-500" variant="outline">
                             Delete
                         </Button>
                     )}
+
+                    <Button type="submit">Submit</Button>
                 </Group>
             </form>
         </>

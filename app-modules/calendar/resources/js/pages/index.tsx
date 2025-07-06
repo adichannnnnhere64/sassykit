@@ -248,7 +248,10 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
     const eventComponent = ({ event }) => {
         return (
             <div>
+                <div className="grid grid-cols-2">
                 <strong>{event.title}</strong>
+                <strong className="text-right">${event.amount.toLocaleString()}</strong>
+                </div>
                 {event.categories?.length > 0 && (
                     <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
                         {event.categories.map((category) => (

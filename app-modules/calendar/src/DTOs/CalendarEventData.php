@@ -18,6 +18,7 @@ final class CalendarEventData extends Data
         public int $id,
         public int $user_id,
         public string $title,
+        public int $amount,
         public ?string $description,
         public CarbonImmutable $start,
         public CarbonImmutable $end,

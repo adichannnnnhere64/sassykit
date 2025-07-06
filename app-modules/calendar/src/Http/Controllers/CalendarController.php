@@ -86,6 +86,7 @@ final class CalendarController
         $description = '';
         $color = null;
         $userCategories = [];
+        $amount = '';
 
         $event = CalendarEvent::with('categories')->find($id);
 
@@ -94,9 +95,10 @@ final class CalendarController
             $description = $event->description;
             $color = $event->color;
             $userCategories = $event->categories?->pluck('id') ?? [];
+            $amount = $event->amount;
         }
 
-        return inertia()->render('calendar::modals/create-event', compact('id', 'start_time', 'end_time', 'start_date', 'end_date', 'categories', 'title', 'description', 'userCategories', 'color'));
+        return inertia()->render('calendar::modals/create-event', compact('id', 'start_time', 'end_time', 'start_date', 'end_date', 'categories', 'title', 'description', 'userCategories', 'color', 'amount'));
     }
 
     /* public function update(Request $request) */
@@ -126,6 +128,7 @@ final class CalendarController
             'end_date' => 'required|date',
             'categories' => 'array|nullable',
             'color' => 'required',
+            'amount' => 'nullable'
         ]);
 
         $start = $data['start_date'].' '.$data['start'];
@@ -135,10 +138,12 @@ final class CalendarController
 
         $event = auth()->user()->calendarEvents()->create([
             'title' => $data['title'],
+            'amount' => $data['amount'],
             'description' => $data['description'],
             'start' => $start,
             'end' => $end,
             'color' => $data['color'],
+
             /* 'category_id' => auth()->user()->calendarCategories()->first()->id */
         ]);
 
@@ -163,6 +168,7 @@ final class CalendarController
             'start_date' => 'required|date',
             'end_date' => 'required|date',
             'color' => 'required',
+            'amount' => 'nullable',
             'categories' => 'nullable|array', // assuming categories is an array of IDs
         ]);
 
@@ -174,6 +180,7 @@ final class CalendarController
             'color' => $data['color'] ?? null,
             'start' => $start,
             'end' => $end,
+            'amount' => $data['amount'],
         ]);
 
         if (isset($data['categories'])) {
