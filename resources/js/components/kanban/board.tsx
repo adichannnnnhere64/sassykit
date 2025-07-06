@@ -622,7 +622,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid grid-cols-2 gap-8 sm:grid-cols-1">
+                            <div className="grid grid-cols-2 gap-8 sm:grid-cols-2">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
                                         <Card
@@ -676,7 +676,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 {...listeners}
                 className={`group relative  cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
                     isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex  w-full flex-col' : 'min-h-[100px]'}`}
+                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? '' : 'min-h-[100px]'}`}
             >
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
