@@ -622,7 +622,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 </div>
                             </SortableContext>
                         ) : (
-                            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                            <div className="grid grid-cols-2 gap-8 sm:grid-cols-1">
                                 <SortableContext items={cards.map((card) => card.id)} strategy={rectSortingStrategy}>
                                     {cards.map((card) => (
                                         <Card
@@ -674,13 +674,13 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 style={style}
                 {...attributes}
                 {...listeners}
-                className={`group relative min-h-[50px]  max-h-[120px] cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
+                className={`group relative  cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
                     isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex aspect-square w-full flex-col' : 'min-h-[100px]'}`}
+                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? 'flex  w-full flex-col' : 'min-h-[100px]'}`}
             >
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
-                    <div className="absolute top-2 right-2 z-10 flex flex-col opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                    <div className="absolute -top-1 right-2 z-10 flex  opacity-0 transition-opacity duration-200 group-hover:opacity-100">
                         <ModalLink href={route('module.kanban.card.edit', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
