@@ -34,6 +34,7 @@ final class CalendarController
         }
 
         $events = CalendarEvent::with('categories')
+            ->where('user_id', auth()->id())
             ->whereBetween('start', [$start, $end])
             ->get();
 
