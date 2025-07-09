@@ -20,6 +20,7 @@ use Modules\Team\Http\Controllers\CalendarController;
 
 Route::middleware(['web', 'auth'])->group(function () {
     Route::get('/calendars', [ControllersCalendarController::class, 'index'])->name('calendar');
+    Route::get('/calendars/events', [ControllersCalendarController::class, 'getEvents'])->name('calendar.events');
     Route::get('/calendars/modal', [ControllersCalendarController::class, 'createModal'])->name('calendar.create-modal');
 
 
@@ -31,6 +32,11 @@ Route::middleware(['web', 'auth'])->group(function () {
     Route::put('/calendar/{model}/time', [ControllersCalendarController::class, 'updateTime'])->name('calendar.update-time');
 
     Route::delete('/calendar/{model}', [ControllersCalendarController::class, 'destroy'])->name('calendar.destroy');
+
+
+
+    Route::delete('/calendar/category/{model}', [CalendarCategoryController::class, 'destroy'])->name('calendar.category.destroy');
+    Route::patch('/calendar/category/{model}', [CalendarCategoryController::class, 'update'])->name('calendar.category.update');
 
 
 });

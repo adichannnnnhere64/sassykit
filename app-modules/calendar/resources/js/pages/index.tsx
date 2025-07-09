@@ -1,12 +1,16 @@
 import AppLayout from '@/layouts/app-layout';
 import { open } from '@/useModal';
-import { router, usePage } from '@inertiajs/react';
-import { Badge, Button, Flex, Group, Modal, MultiSelect, Paper, Stack, Text, TextInput } from '@mantine/core';
+import { Link, router, usePage } from '@inertiajs/react';
+import { Badge, Button, Flex, Group, Paper, Stack, Text } from '@mantine/core';
+import axios from 'axios';
+import addMonths from 'date-fns/addMonths';
+import endOfWeek from 'date-fns/endOfWeek';
 import format from 'date-fns/format';
 import getDay from 'date-fns/getDay';
 import enUS from 'date-fns/locale/en-US';
 import parse from 'date-fns/parse';
 import startOfWeek from 'date-fns/startOfWeek';
+import subMonths from 'date-fns/subMonths';
 import { useCallback, useEffect, useState } from 'react';
 import { Calendar, dateFnsLocalizer, Views } from 'react-big-calendar';
 import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
@@ -40,24 +44,18 @@ interface Event {
     allDay: boolean;
     categories: Category[];
     status?: 'pending' | 'completed' | 'cancelled';
+    amount?: number;
+    color?: string;
 }
 
 interface CalendarPageProps {
     defaultCategories?: Category[];
     defaultEvents?: Event[];
     defaultColor?: string;
+    total?: number;
 }
 
-const DEFAULT_CATEGORIES: Category[] = [
-    { name: 'work', color: '#3174ad' },
-    { name: 'personal', color: '#ff6b6b' },
-    { name: 'meeting', color: '#51cf66' },
-    { name: 'deadline', color: '#ffa94d' },
-    { name: 'appointment', color: '#9775fa' },
-    { name: 'travel', color: '#20c997' },
-];
-
-export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, defaultEvents = [], defaultColor = '#5c6bc0' }: CalendarPageProps) {
+export default function CalendarPage({ defaultCategories = [], defaultEvents = [], defaultColor = '#5c6bc0', total = 0 }: CalendarPageProps) {
     const [categories] = useState<Category[]>(defaultCategories);
     const [events, setEvents] = useState<Event[]>(
         defaultEvents.map((event) => ({
@@ -67,27 +65,106 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
             categories: event.categories || [],
         })),
     );
+    const [currentTotal, setCurrentTotal] = useState(total);
+    const [currentView, setCurrentView] = useState<Views>(
+        // Get initial view from URL or default to MONTH
+        (new URLSearchParams(window.location.search).get('view') as Views) || Views.MONTH,
+    );
+    const [currentDate, setCurrentDate] = useState<Date>(
+        // Get initial date from URL or default to now
+        new Date(new URLSearchParams(window.location.search).get('date') || new Date()),
+    );
 
-    const [currentDate, setCurrentDate] = useState(new Date());
-    const [currentView, setCurrentView] = useState<Views>(Views.MONTH);
+    const [isLoading, setIsLoading] = useState(false);
+    const { version } = usePage();
 
-    // Modal state
-    const [modalOpened, setModalOpened] = useState(false);
-    const [currentEvent, setCurrentEvent] = useState<Event | null>(null);
-    const [newEventTitle, setNewEventTitle] = useState('');
-    const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [slotInfo, setSlotInfo] = useState<any>(null);
+    const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+
+    const calculateDateRange = useCallback((date: Date, view: Views) => {
+        let start: Date, end: Date;
+
+        switch (view) {
+            case Views.MONTH:
+                start = new Date(date.getFullYear(), date.getMonth(), 1);
+                end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                break;
+            case Views.WEEK:
+                start = startOfWeek(date, { weekStartsOn: 1 });
+                end = endOfWeek(date, { weekStartsOn: 1 });
+                break;
+            case Views.DAY:
+                start = new Date(date);
+                start.setHours(0, 0, 0, 0);
+                end = new Date(date);
+                end.setHours(23, 59, 59, 999);
+                break;
+            case Views.AGENDA:
+                // Show 6 months of events in agenda view
+                start = subMonths(new Date(date), 3);
+                end = addMonths(new Date(date), 3);
+                break;
+            default:
+                start = new Date(date);
+                end = new Date(date);
+        }
+
+        // Ensure proper time boundaries
+        start.setHours(0, 0, 0, 0);
+        end.setHours(23, 59, 59, 999);
+
+        return { start, end };
+    }, []);
+
+const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Views) => {
+    setIsLoading(true);
+    try {
+        const response = await axios.get(route('calendar.events'), {
+            params: {
+                start: start.toISOString(),
+                end: end.toISOString(),
+                view: view === Views.AGENDA ? 'agenda' : null,
+                categories: selectedCategories.length > 0 ? selectedCategories : undefined,
+            },
+        });
+
+        const formattedEvents = response.data.events.map((event: any) => ({
+            ...event,
+            start: new Date(event.start),
+            end: new Date(event.end),
+            categories: event.categories || [],
+        }));
+
+        setEvents(formattedEvents);
+        setCurrentTotal(response.data.total);
+    } catch (error) {
+        console.error('Error fetching events:', error);
+    } finally {
+        setIsLoading(false);
+    }
+}, [selectedCategories]); // Add selectedCategories to dependencies
+
+    useEffect(() => {
+        const { start, end } = calculateDateRange(currentDate, currentView);
+        fetchEventsForRange(start, end, currentView);
+    }, [currentDate, currentView, fetchEventsForRange, calculateDateRange, selectedCategories]);
+
+    useEffect(() => {
+        const { start, end } = calculateDateRange(currentDate, currentView);
+        fetchEventsForRange(start, end, currentView);
+    }, [currentDate, currentView, fetchEventsForRange, calculateDateRange]);
 
     const handleEventDrop = useCallback(
         ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
             const { allDay } = event;
 
-            if (!allDay && droppedOnAllDaySlot) {
-                event.allDay = true;
-            }
-            if (allDay && !droppedOnAllDaySlot) {
-                event.allDay = false;
-            }
+            // if (!allDay && droppedOnAllDaySlot) {
+                // event.allDay = true;
+            // }
+            // if (allDay && !droppedOnAllDaySlot) {
+            event.allDay = false;
+            // }
+
+            console.log(start, end);
 
             setEvents((prev) => {
                 const existing = prev.find((ev) => ev.id === event.id) ?? {};
@@ -98,7 +175,7 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
                         ...existing,
                         start,
                         end,
-                        allDay: event.allDay,
+                        allDay: false,
                     },
                 ];
             });
@@ -112,7 +189,6 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
                 },
             );
         },
-
         [setEvents],
     );
 
@@ -132,112 +208,74 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
                     preserveState: true,
                 },
             );
-
         },
         [setEvents],
-
-
-
     );
 
-    const { version } = usePage();
-    const handleSelectSlot = (slotInfo) => {
-        setSlotInfo(slotInfo);
-        setCurrentEvent(null);
+    const [editingCategory, setEditingCategory] = useState<{ id: number | null; name: string }>({ id: null, name: '' });
+
+    const handleCategoryUpdate = (categoryId: number) => {
+        if (!editingCategory.name.trim()) return;
+
+        router.patch(
+            route('calendar.category.update', categoryId),
+            {
+                name: editingCategory.name,
+            },
+            {
+                preserveScroll: true,
+                onSuccess: () => {
+                    setEditingCategory({ id: null, name: '' });
+                    router.visit(window.location.pathname, {
+                        preserveScroll: true,
+                        only: ['defaultCategories'],
+                    });
+                },
+            },
+        );
+    };
+
+    const handleSelectSlot = (slotInfo: any) => {
         open(
             route('calendar.create-modal', {
-                start: slotInfo.start,
-                end: slotInfo.end,
-                id: slotInfo.id
+                start: slotInfo.start.toISOString(),
+                end: slotInfo.end.toISOString(),
             }),
             version ?? '',
         );
     };
 
-    const handleSelectEvent = (event) => {
-        setCurrentEvent(event);
-        setNewEventTitle(event.title);
-        setSelectedCategories(event.categories.map((c) => c.name));
+    const handleSelectEvent = (event: Event) => {
         open(
             route('calendar.create-modal', {
-                start: event.start,
-                end: event.end,
-                id: event.id
+                start: event.start.toISOString(),
+                end: event.end.toISOString(),
+                id: event.id,
             }),
             version ?? '',
         );
-    };
-
-    const handleSaveEvent = () => {
-        if (!newEventTitle.trim()) return;
-
-        const selectedCategoryObjects = categories.filter((cat) => selectedCategories.includes(cat.name));
-
-        if (currentEvent) {
-            // Update existing event
-            const updatedEvent = {
-                ...currentEvent,
-                title: newEventTitle,
-                categories: selectedCategoryObjects,
-            };
-            setEvents((prev) => prev.map((evt) => (evt.id === currentEvent.id ? updatedEvent : evt)));
-        } else {
-            // Create new event
-            const newEvent: Event = {
-                id: Date.now(),
-                title: newEventTitle,
-                start: new Date(slotInfo.start),
-                end: new Date(slotInfo.end),
-                allDay: slotInfo.slots.length === 1,
-                categories: selectedCategoryObjects,
-                status: 'pending',
-            };
-            setEvents((prev) => [...prev, newEvent]);
-        }
-
-        setModalOpened(false);
-    };
-
-    const handleDeleteEvent = () => {
-        if (currentEvent) {
-            setEvents((prev) => prev.filter((evt) => evt.id !== currentEvent.id));
-            setModalOpened(false);
-        }
-    };
-
-    const handleNavigate = (date: Date) => {
-        setCurrentDate(date);
     };
 
     const handleViewChange = (view: Views) => {
+        console.log('burik');
         setCurrentView(view);
+        // Update URL without reload
+        window.history.replaceState({}, '', `?view=${view}&date=${currentDate.toISOString()}`);
     };
 
-    // const handleSaveCalendar = async () => {
-    //     try {
-    //         await axios.post('/api/calendar/save', {
-    //             currentDate: currentDate.toISOString(),
-    //             currentView,
-    //             events: events.map(event => ({
-    //                 ...event,
-    //                 start: event.start.toISOString(),
-    //                 end: event.end.toISOString(),
-    //                 categories: event.categories
-    //             }))
-    //         });
-    //         alert('Current events saved successfully!');
-    //     } catch (error) {
-    //         alert('Error saving calendar');
-    //         console.error(error);
-    //     }
-    // };
+    // Handle navigation
+    const handleNavigate = (date: Date) => {
+        console.log(date);
+        setCurrentDate(date);
+        // Update URL without reload
+        window.history.replaceState({}, '', `?view=${currentView}&date=${date.toISOString()}`);
+    };
 
     const eventPropGetter = (event: Event) => {
         return {
             style: {
                 backgroundColor: event?.color || defaultColor,
                 borderRadius: '4px',
-                // border: `2px solid ${defaultColor}`,
                 color: 'white',
                 fontSize: '12px',
                 textDecoration: event.status === 'completed' ? 'line-through' : 'none',
@@ -245,12 +283,13 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
         };
     };
 
-    const eventComponent = ({ event }) => {
+    const eventComponent = ({ event }: { event: Event }) => {
+        console.log(event);
         return (
             <div>
                 <div className="grid grid-cols-2">
-                <strong>{event.title}</strong>
-                <strong className="text-right">${event.amount.toLocaleString()}</strong>
+                    <strong>{event.title}</strong>
+                    {event.amount && <strong className="text-right">${event.amount.toLocaleString()}</strong>}
                 </div>
                 {event.categories?.length > 0 && (
                     <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
@@ -275,66 +314,169 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
         );
     };
 
-    useEffect(() => {
-        setEvents(
-            defaultEvents.map((event) => ({
-                ...event,
-                start: new Date(event.start),
-                end: new Date(event.end),
-                categories: event.categories || [],
-            })),
+    const agendaEventComponent = ({ event }: { event: Event }) => {
+        return (
+            <div className="border-b border-gray-200 p-3 transition-colors hover:bg-gray-50">
+                <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                        <div className="font-semibold text-gray-900">{event.title}</div>
+                        <div className="mt-1 text-sm text-gray-600">
+                            {format(event.start, 'EEEE, MMMM d, yyyy')}
+                            {!event.allDay && (
+                                <>
+                                    {' • '}
+                                    {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
+                                </>
+                            )}
+                        </div>
+                        {event.categories?.length > 0 && (
+                            <div className="mt-2 flex flex-wrap gap-1">
+                                {event.categories.map((category) => (
+                                    <span
+                                        key={category.name}
+                                        className="rounded-full px-2 py-1 text-xs text-white"
+                                        style={{ backgroundColor: category.color }}
+                                    >
+                                        {category.name}
+                                    </span>
+                                ))}
+                            </div>
+                        )}
+                    </div>
+                    {event.amount && <div className="ml-4 text-sm font-semibold text-gray-900">${event.amount.toLocaleString()}</div>}
+                </div>
+            </div>
         );
-    }, [defaultEvents]);
+    };
 
     return (
         <AppLayout>
             <Stack spacing="lg">
-                <Flex justify="space-between" align="center" items="end" position="apart">
+                <Flex justify="space-between" align="center">
                     <Paper p="md" withBorder>
-                        <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create', {
-                            create: true
-                        }), version ?? '', 'xs')}>
+                        <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create'), version ?? '', 'xs')}>
                             Add Category
                         </Button>
-
                         <Group spacing="sm">
                             {categories.map((category) => (
-                                <Badge
-                                    key={category.name}
-                                    variant="filled"
-                                    style={{
-                                        backgroundColor: category.color,
-                                        color: 'white',
-                                        textTransform: 'capitalize',
-                                    }}
-                                >
-                                    {category.name}
-                                </Badge>
+                                <div key={category.name} className="flex items-center">
+                                    {editingCategory.id === category.id ? (
+                                        <input
+                                            type="text"
+                                            value={editingCategory.name}
+                                            onChange={(e) => setEditingCategory({ ...editingCategory, name: e.target.value })}
+                                            onKeyDown={(e) => e.key === 'Enter' && handleCategoryUpdate(category.id)}
+                                            onBlur={() => handleCategoryUpdate(category.id)}
+                                            autoFocus
+                                            className="w-32 rounded border px-1 py-0.5 text-sm"
+                                        />
+                                    ) : (
+                                        <>
+                                            <Badge
+                                                variant="filled"
+                                                style={{
+                                                    backgroundColor: category.color,
+                                                    color: 'white',
+                                                    textTransform: 'capitalize',
+                                                    cursor: 'pointer',
+                                                }}
+                                                onClick={() => setEditingCategory({ id: category.id, name: category.name })}
+                                            >
+                                                {category.name}
+                                            </Badge>
+                                            <Link
+                                                className="ml-1 text-gray-500"
+                                                method="delete"
+                                                onSuccess={() => {
+                                                    router.visit(window.location.pathname, {
+                                                        preserveScroll: true,
+                                                    });
+                                                }}
+                                                onClick={(e) => {
+                                                    if (!window.confirm('Are you sure you want to delete this category?')) {
+                                                        e.preventDefault();
+                                                    }
+                                                }}
+                                                href={route('calendar.category.destroy', category.id)}
+                                            >
+                                                <svg
+                                                    xmlns="http://www.w3.org/2000/svg"
+                                                    width="16"
+                                                    height="16"
+                                                    viewBox="0 0 24 24"
+                                                    fill="none"
+                                                    stroke="currentColor"
+                                                    stroke-width="2"
+                                                    stroke-linecap="round"
+                                                    stroke-linejoin="round"
+                                                    className="tabler-icon tabler-icon-x"
+                                                >
+                                                    <path d="M18 6l-12 12"></path>
+                                                    <path d="M6 6l12 12"></path>
+                                                </svg>
+                                            </Link>
+                                        </>
+                                    )}
+                                </div>
                             ))}
                         </Group>
                     </Paper>
-                    <div>
-                        <Button
-                            size="xs"
-                            onClick={() =>
-                                open(
-                                    route('calendar.create-modal', { start: currentDate.toISOString(), end: currentDate.toISOString() }),
-                                    version ?? '',
-                                )
-                            }
-                        >
-                            Add Event
-                        </Button>
-                    </div>
+                    <Button
+                        size="xs"
+                        onClick={() =>
+                            open(
+                                route('calendar.create-modal', {
+                                    start: currentDate.toISOString(),
+                                    end: currentDate.toISOString(),
+                                }),
+                                version ?? '',
+                            )
+                        }
+                    >
+                        Add Event
+                    </Button>
                 </Flex>
 
+                <Paper p="md" withBorder>
+                    <Flex gap="sm" align="center">
+                        <Text size="sm" weight={500}>
+                            Filter by:
+                        </Text>
+                                {categories.map((category) => (
+            <Badge
+                key={category.id}
+                variant={selectedCategories.includes(category.id) ? 'filled' : 'outline'}
+                style={{
+                    backgroundColor: selectedCategories.includes(category.id) ? category.color : undefined,
+                    color: selectedCategories.includes(category.id) ? 'white' : undefined,
+                    cursor: 'pointer',
+                    textTransform: 'capitalize'
+                }}
+                onClick={() => {
+                    setSelectedCategories(prev =>
+                        prev.includes(category.id)
+                            ? prev.filter(id => id !== category.id)
+                            : [...prev, category.id]
+                    );
+                }}
+            >
+                {category.name}
+            </Badge>
+        ))}
+                        {selectedCategories.length > 0 && (
+                            <Button size="xs" variant="subtle" onClick={() => setSelectedCategories([])}>
+                                Clear filters
+                            </Button>
+                        )}
+                    </Flex>
+                </Paper>
                 <DnDCalendar
                     localizer={localizer}
                     events={events}
                     view={currentView}
                     onView={handleViewChange}
-                    defaultView={Views.WEEK}
-                    views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
+                    defaultView={Views.MONTH}
+                    views={[Views.MONTH, Views.AGENDA]}
                     step={30}
                     timeslots={2}
                     min={new Date(0, 0, 0, 8, 0, 0)}
@@ -342,23 +484,42 @@ export default function CalendarPage({ defaultCategories = DEFAULT_CATEGORIES, d
                     startAccessor="start"
                     endAccessor="end"
                     allDayAccessor="allDay"
-                    resizable
                     selectable
                     popup
                     onEventDrop={handleEventDrop}
-                    onEventResize={handleEventResize}
                     onSelectSlot={handleSelectSlot}
                     onSelectEvent={handleSelectEvent}
                     onNavigate={handleNavigate}
-                    style={{ height: '70vh' }}
+                    style={{ height: '80vh' }}
                     defaultDate={currentDate}
                     draggableAccessor={() => true}
                     eventPropGetter={eventPropGetter}
                     components={{
                         event: eventComponent,
+                        agenda: {
+                            event: agendaEventComponent,
+                            header: () => (isLoading ? <div className="p-4 text-center text-gray-500">Loading events...</div> : null),
+                        },
+                    }}
+                    messages={{
+                        agenda: 'Agenda',
+                        date: 'Date',
+                        time: 'Time',
+                        event: 'Event',
+                        noEventsInRange: 'No events found in this date range.',
+                        showMore: (count) => `+${count} more events`,
                     }}
                 />
-
+                <Paper p="md" withBorder>
+                    <Flex justify="space-between" align="center">
+                        <Text size="sm" weight={500}>
+                            Total Amount:
+                        </Text>
+                        <Text size="lg" weight={700}>
+                            ${currentTotal.toLocaleString()}
+                        </Text>
+                    </Flex>
+                </Paper>
             </Stack>
         </AppLayout>
     );

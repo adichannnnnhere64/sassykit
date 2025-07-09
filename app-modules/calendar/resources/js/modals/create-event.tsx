@@ -2,7 +2,7 @@ import MultiSelectCombobox from '@/components/pills-input';
 import { close } from '@/useModal';
 import { router, useForm } from '@inertiajs/react';
 import { Button, ColorInput, Group, Textarea, TextInput } from '@mantine/core';
-import { DateInput, TimePicker } from '@mantine/dates';
+import { DateInput, TimeInput } from '@mantine/dates';
 import '@mantine/dates/styles.css';
 import { FormEventHandler } from 'react';
 
@@ -10,140 +10,174 @@ export default function CreateEvent({
     start_time,
     end_time,
     start_date,
-    end_date,
     categories,
     id,
     title,
     description,
     userCategories,
     color = '#2e2e2e',
-    amount = ""
+    amount = '',
 }: {
     start_time: string;
     end_time: string;
     start_date: string;
-    end_date: string;
     categories: [];
-    id: Number | null;
+    id: number | null;
     title?: string;
     description?: string;
     userCategories?: [];
     color: string;
-    amount: string
+    amount: string;
 }) {
     const { data, setData, post, put } = useForm({
-        start: start_time,
-        end: end_time,
-        start_date: start_date,
-        end_date: end_date,
-        title: title,
-        description: description,
-        categories: userCategories,
-        color: color ?? '#2e2e2e',
-        amount: amount
+        title: title || '',
+        description: description || '',
+        categories: userCategories || [],
+        color: color || '#2e2e2e',
+        amount: amount || '',
+        start_date: start_date || new Date().toISOString(),
+        start_time: start_time || '12:00',
+        end_time: end_time || '13:00',
     });
 
-    // const categories = [
-    //     { value: '1', label: '🍎 Apples' },
-    //     { value: '2', label: '🍌 Bananas' },
-    //     { value: '3', label: '🥦 Broccoli' },
-    //     { value: '4', label: '🥕 Carrots' },
-    //     { value: '5', label: '🍫 Chocolate' },
-    // ];
-
-    // console.log(categories, defaultCategories)
-    //
-
-    const handleDeleteEvent = (e) => {
+    const handleDeleteEvent = (e: React.MouseEvent) => {
         e.preventDefault();
-        router.delete(route('calendar.destroy', { id }), {
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                close();
-            },
-        });
-    };
-
-    const submitHandler: FormEventHandler = (e) => {
-        e.preventDefault();
-
-        // console.log(id);
-        if (id == null) {
-            post(route('calendar.store'), {
+        if (id && window.confirm('Are you sure you want to delete this event?')) {
+            router.delete(route('calendar.destroy', { id }), {
                 preserveScroll: true,
                 onSuccess: () => {
                     close();
-                },
-            });
-        } else {
-            put(route('calendar.update', { id }), {
-                preserveScroll: true,
-                onSuccess: () => {
-                    close();
+                    router.visit(route('calendar.index'), {
+                        only: ['defaultEvents', 'total'],
+                        preserveScroll: true,
+                        preserveState: true,
+                    });
                 },
             });
         }
     };
 
+    const formatTime = (date: Date | null): string => {
+        if (!date) return '12:00';
+        const hours = date.getHours().toString().padStart(2, '0');
+        const minutes = date.getMinutes().toString().padStart(2, '0');
+        return `${hours}:${minutes}`;
+    };
+
+    const parseTimeString = (timeString: string): Date => {
+        const [hours, minutes] = timeString.split(':').map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return date;
+    };
+
+    const submitHandler: FormEventHandler = (e) => {
+        e.preventDefault();
+
+        // Combine date and time into ISO strings
+        const startDateTime = new Date(data.start_date);
+        const [startHours, startMinutes] = data.start_time.split(':').map(Number);
+        startDateTime.setHours(startHours, startMinutes);
+
+        const endDateTime = new Date(data.start_date);
+        const [endHours, endMinutes] = data.end_time.split(':').map(Number);
+        endDateTime.setHours(endHours, endMinutes);
+
+        const submitMethod = id ? put : post;
+        const routeName = id ? route('calendar.update', { id }) : route('calendar.store');
+
+        submitMethod(routeName, {
+            preserveScroll: true,
+            onSuccess: () => {
+                router.visit(window.location.pathname, {
+                    only: ['defaultEvents', 'total'],
+                    preserveScroll: true,
+                    onSuccess: () => {
+                        close();
+                    },
+
+                    data: {
+                        view: new URLSearchParams(window.location.search).get('view') || 'month',
+                        date: new URLSearchParams(window.location.search).get('date') || new Date().toISOString(),
+                    },
+                });
+            },
+        });
+    };
+
     return (
-        <>
-            <form onSubmit={submitHandler} className="space-y-3">
-                <TextInput required label="Title" autoFocus value={data.title} onChange={(e) => setData('title', e.target.value)} />
+        <form onSubmit={submitHandler} className="space-y-3">
+            <TextInput required label="Title" autoFocus value={data.title} onChange={(e) => setData('title', e.target.value)} />
 
-                <TextInput required label="Amount" autoFocus value={data.amount} onChange={(e) => setData('amount', e.target.value)} />
-                <Textarea label="Description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
+            <TextInput required label="Amount" value={data.amount} onChange={(e) => setData('amount', e.target.value)} />
 
-                <DateInput
-                    value={data.start_date}
-                    onChange={(e) => setData('start_date', e.toString())}
-                    label="Date input"
-                    placeholder="Date input"
-                />
-                <TimePicker label="Start" value={data.start} withDropdown format="12h" onChange={(e) => setData('start', e.toString())} />
-                <DateInput value={data.end_date} onChange={(e) => setData('end_date', e.toString())} label="Date input" placeholder="Date input" />
-                <TimePicker label="End" value={data.end} withDropdown format="12h" onChange={(e) => setData('end', e.toString())} />
-                <MultiSelectCombobox
-                    label="Categories"
-                    data={categories}
-                    placeholder="Select categories"
-                    value={data.categories}
-                    onChange={(values) => setData('categories', values)}
-                />
+            <Textarea label="Description" value={data.description} onChange={(e) => setData('description', e.target.value)} />
 
-                <ColorInput
-                    label="Color"
-                    value={data.color}
-                    onChange={(color) => setData('color', color)}
-                    format="hex"
-                    swatches={[
-                        '#2e2e2e',
-                        '#868e96',
-                        '#fa5252',
-                        '#e64980',
-                        '#be4bdb',
-                        '#7950f2',
-                        '#4c6ef5',
-                        '#228be6',
-                        '#15aabf',
-                        '#12b886',
-                        '#40c057',
-                        '#82c91e',
-                        '#fab005',
-                        '#fd7e14',
-                    ]}
-                />
+            <DateInput
+                required
+                value={new Date(data.start_date)}
+                onChange={(date) => setData('start_date', date)}
+                label="Event Date"
+                placeholder="Select date"
+            />
 
-                <Group justify="flex-end" mt="md">
-                    {id && (
-                        <Button onClick={() => window.confirm('Are you sure you want to delete this event?') && handleDeleteEvent} className="!border-red-500 !text-red-500" variant="outline">
-                            Delete
-                        </Button>
-                    )}
+            <TimeInput
 
-                    <Button type="submit">Submit</Button>
-                </Group>
-            </form>
-        </>
+                display={'none'}
+                // required
+                label="Start Time"
+                value={parseTimeString(data.start_time)}
+                onChange={(date) => setData('start_time', formatTime(date))}
+            />
+
+            <TimeInput
+                // required
+                display={'none'}
+                label="End Time"
+                value={parseTimeString(data.end_time)}
+                onChange={(date) => setData('end_time', formatTime(date))}
+            />
+
+            <MultiSelectCombobox
+                label="Categories"
+                data={categories}
+                placeholder="Select categories"
+                value={data.categories}
+                onChange={(values) => setData('categories', values)}
+            />
+
+            <ColorInput
+                label="Color"
+                value={data.color}
+                onChange={(color) => setData('color', color)}
+                format="hex"
+                swatches={[
+                    '#2e2e2e',
+                    '#868e96',
+                    '#fa5252',
+                    '#e64980',
+                    '#be4bdb',
+                    '#7950f2',
+                    '#4c6ef5',
+                    '#228be6',
+                    '#15aabf',
+                    '#12b886',
+                    '#40c057',
+                    '#82c91e',
+                    '#fab005',
+                    '#fd7e14',
+                ]}
+            />
+
+            <Group justify="flex-end" mt="md">
+                {id && (
+                    <Button onClick={handleDeleteEvent} className="!border-red-500 !text-red-500" variant="outline">
+                        Delete
+                    </Button>
+                )}
+
+                <Button type="submit">Submit</Button>
+            </Group>
+        </form>
     );
 }

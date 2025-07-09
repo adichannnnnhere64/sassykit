@@ -32,4 +32,26 @@ final class CalendarCategoryController
         return redirect()->route('calendar')->with('success', 'Category created successfully');
     }
 
+    public function destroy(Request $request, CalendarCategory $model)
+    {
+        $model->delete();
+
+        return redirect()->back()->with([
+            'message' => 'Category deleted successfully',
+        ]);
+
+    }
+
+    public function update(Request $request, CalendarCategory $model)
+    {
+        $model->name = $request->name;
+        $model->save();
+
+        return redirect()->back()->with([
+            'message' => 'Category updated successfully',
+        ]);
+
+
+    }
+
 }

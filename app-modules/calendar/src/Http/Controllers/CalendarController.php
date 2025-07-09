@@ -13,93 +13,142 @@ use Modules\Calendar\Models\CalendarEvent;
 
 final class CalendarController
 {
-    public function index()
+    public function index(Request $request)
     {
-        /* dd(auth()->user()->setSetting('theme', 'dark')); */
+        $view = $request->input('view', 'month');
+        $date = $request->input('date') ? Carbon::parse($request->input('date')) : now();
 
-        /* $theme = auth()->user()->getSetting('theme', 'light'); */
-        // Define color mappings (could also come from database)
+        // Calculate date range based on view
+        switch ($view) {
+            case 'week':
+                $start = $date->startOfWeek();
+                $end = $date->endOfWeek();
+                break;
+            case 'day':
+                $start = $date->startOfDay();
+                $end = $date->endOfDay();
+                break;
+            default: // month
+                $start = $date->startOfMonth();
+                $end = $date->endOfMonth();
+        }
 
-        /* auth()->user()->calendarCategories()->create([ */
-        /* 'name' => 'tubol', */
-        /* 'color' => 'pink', */
-        /* ]); */
-
-        /* auth()->user()->calendarEvents()->create([ */
-        /*      'title' => 'Team Meeting', */
-        /*      'start' => now()->addDay(), */
-        /*      'end' => now()->addDay()->addHour(), */
-        /*     'category_id' => auth()->user()->calendarCategories()->first()->id */
-        /* ]); */
-
-        /* dd( CalendarEventData::collect(auth()->user()->calendarEvents)); */
-
-        $calendarEvents = CalendarEvent::with('categories')->where('user_id', auth()->user()->id)->get();
-
-        /* dd($calendarEvents->first()->categories); */
-        /* dd(CalendarEventData::from($calendarEvents->first())); */
-        $events = CalendarEventData::collect($calendarEvents);
+        $events = CalendarEvent::with('categories')
+            ->whereBetween('start', [$start, $end])
+            ->get();
 
         return inertia()->render('calendar::index', [
-            'defaultEvents' => $events,
             'defaultCategories' => CalendarCategoryData::collect(auth()->user()->calendarCategories()->get()),
-            'defaultColor' => '#3174ad',
+            'defaultEvents' => $events,
+            'total' => $events->sum('amount'),
+            'currentView' => $view,
+            'currentDate' => $date->toISOString(),
+        ]);
+    }
+
+    public function getEvents(Request $request)
+    {
+          $request->validate([
+        'start' => 'required|date',
+        'end' => 'required|date',
+        'view' => 'nullable|string|in:month,week,day,agenda',
+        'categories' => 'nullable|array',
+        'categories.*' => 'nullable|integer|exists:calendar_categories,id',
+    ]);
+
+    $calendarEvents = $this->getEventsInRange(
+        $request->start,
+        $request->end,
+        $request->input('categories', [])
+        );
+
+        $events = CalendarEventData::collect($calendarEvents);
+
+        // Calculate total differently for agenda view
+        $total = $events->sum('amount');
+
+        if ($request->view === 'agenda') {
+            // For agenda view, calculate total only for current month
+            $currentMonthStart = now()->startOfMonth();
+            $currentMonthEnd = now()->endOfMonth();
+
+            $monthEvents = $calendarEvents->filter(function ($event) use ($currentMonthStart, $currentMonthEnd) {
+                return $event->start->between($currentMonthStart, $currentMonthEnd) ||
+                       $event->end->between($currentMonthStart, $currentMonthEnd) ||
+                       ($event->start <= $currentMonthStart && $event->end >= $currentMonthEnd);
+            });
+
+            $total = $monthEvents->sum('amount');
+        }
+
+        return response()->json([
+            'total' => $total,
+            'events' => $events,
         ]);
     }
 
     public function createModal(Request $request)
-    {
+{
+    $data = $request->validate([
+        'start' => 'required|date',
+        'end' => 'required|date',
+        'id' => 'nullable',
+        'create' => 'nullable',
+    ]);
 
-        $data = $request->validate([
-            'start' => 'required|date',
-            'end' => 'required|date',
-            'id' => 'nullable',
-            'create' => 'nullable',
-        ]);
-        /* dd($data); */
+    $id = @$data['id'];
+    $create = @$data['create'];
 
-        $id = @$data['id'];
-        $create = @$data['create'];
-        $start_time = Carbon::parse($data['start'])->format('H:i:s');
-        $end_time = Carbon::parse($data['end'])->format('H:i:s');
 
-        $start_date = Carbon::parse($data['start'])->format('Y-m-d');
-        $end_date = Carbon::parse($data['end'])->format('Y-m-d');
+    $start_time = Carbon::parse($data['start'])->format('H:i:s');
+    $end_time = Carbon::parse($data['start'])->format('H:i:s');
 
-        if ($create) {
-            $start_time = now()->format('H:i:s');
-            $end_time = now()->addHour()->format('H:i:s');
+    $date = Carbon::parse($data['end'])->format('Y-m-d');
 
-            $start_date = now()->format('Y-m-d');
-            $end_date = now()->format('Y-m-d');
-        }
-
-        $categories = auth()->user()->calendarCategories()->get()->map(function ($data) {
-            return [
-                'value' => $data->id,
-                'label' => $data->name,
-                'color' => $data->color,
-            ];
-        });
-
-        $title = '';
-        $description = '';
-        $color = null;
-        $userCategories = [];
-        $amount = '';
-
-        $event = CalendarEvent::with('categories')->find($id);
-
-        if ($event) {
-            $title = $event->title;
-            $description = $event->description;
-            $color = $event->color;
-            $userCategories = $event->categories?->pluck('id') ?? [];
-            $amount = $event->amount;
-        }
-
-        return inertia()->render('calendar::modals/create-event', compact('id', 'start_time', 'end_time', 'start_date', 'end_date', 'categories', 'title', 'description', 'userCategories', 'color', 'amount'));
+    if ($create) {
+        $start_time = now()->format('H:i:s');
+        $end_time = now()->addHour()->format('H:i:s');
+        $date = now()->format('Y-m-d');
     }
+
+    $categories = auth()->user()->calendarCategories()->get()->map(function ($data) {
+        return [
+            'value' => $data->id,
+            'label' => $data->name,
+            'color' => $data->color,
+        ];
+    });
+
+    $title = '';
+    $description = '';
+    $color = null;
+    $userCategories = [];
+    $amount = '';
+
+    $event = CalendarEvent::with('categories')->find($id);
+
+    if ($event) {
+        $title = $event->title;
+        $description = $event->description;
+        $color = $event->color;
+        $userCategories = $event->categories?->pluck('id') ?? [];
+        $amount = $event->amount;
+    }
+
+    return inertia()->render('calendar::modals/create-event', [
+        'id' => $id,
+        'start_time' => $start_time,
+        'end_time' => $end_time,
+        'start_date' => $date,
+        'categories' => $categories,
+        'title' => $title,
+        'description' => $description,
+        'userCategories' => $userCategories,
+        'color' => $color,
+        'amount' => $amount
+    ]);
+}
+
 
     /* public function update(Request $request) */
     /* { */
@@ -122,17 +171,17 @@ final class CalendarController
         $data = $request->validate([
             'title' => 'required',
             'description' => 'nullable',
-            'start' => 'required',
-            'end' => 'required',
-            'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            'start_date' => 'required',
+            /* 'end' => 'required', */
+            /* 'start_date' => 'required|date', */
+            /* 'end_date' => 'required|date', */
             'categories' => 'array|nullable',
             'color' => 'required',
-            'amount' => 'nullable'
+            'amount' => 'nullable',
         ]);
 
-        $start = $data['start_date'].' '.$data['start'];
-        $end = $data['end_date'].' '.$data['end'];
+        $start = $data['start_date'] . ' 12:00:00';
+        $end = $data['start_date'] . ' 12:59:59';
 
         /* dd($data, $start, $end); */
 
@@ -163,17 +212,18 @@ final class CalendarController
         $data = $request->validate([
             'title' => 'nullable',
             'description' => 'nullable',
-            'start' => 'required',
-            'end' => 'required',
+            /* 'start' => 'required', */
+            /* 'end' => 'required', */
             'start_date' => 'required|date',
-            'end_date' => 'required|date',
+            /* 'end_date' => 'required|date', */
             'color' => 'required',
             'amount' => 'nullable',
             'categories' => 'nullable|array', // assuming categories is an array of IDs
         ]);
 
-        $start = $data['start_date'].' '.$data['start'];
-        $end = $data['end_date'].' '.$data['end'];
+        $start = $data['start_date'] . ' 12:00:00';
+        $end = $data['start_date'] . ' 12:59:59';
+
         $model->update([
             'title' => @$data['title'] ?? null, // Fallback to null if key doesn't exist
             'description' => @$data['description'] ?? null,
@@ -199,9 +249,10 @@ final class CalendarController
             'end' => 'required',
         ]);
 
+
         $model->update([
             'start' => $data['start'],
-            'end' => $data['end'],
+            'end' => $data['start'],
         ]);
 
         return redirect()->back()->with([
@@ -217,4 +268,31 @@ final class CalendarController
             'message' => 'Event deleted successfully',
         ]);
     }
+
+    private function getEventsInRange($start, $end, $categoryIds = [])
+{
+    $start = Carbon::parse($start);
+    $end = Carbon::parse($end);
+
+    $query = CalendarEvent::with('categories')
+        ->where('user_id', auth()->id())
+        ->where(function ($query) use ($start, $end) {
+            $query->whereBetween('start', [$start, $end])
+                ->orWhereBetween('end', [$start, $end])
+                ->orWhere(function ($q) use ($start, $end) {
+                    $q->where('start', '<', $start)
+                        ->where('end', '>', $end);
+                });
+        });
+
+    // Add category filter if category IDs are provided
+    if (!empty($categoryIds)) {
+        $query->whereHas('categories', function ($q) use ($categoryIds) {
+            $q->whereIn('calendar_categories.id', $categoryIds);
+        });
+    }
+
+    return $query->orderBy('start')->get();
+}
+
 }

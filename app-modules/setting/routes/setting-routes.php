@@ -9,3 +9,9 @@
 // Route::get('/settings/{setting}/edit', [SettingController::class, 'edit'])->name('settings.edit');
 // Route::put('/settings/{setting}', [SettingController::class, 'update'])->name('settings.update');
 // Route::delete('/settings/{setting}', [SettingController::class, 'destroy'])->name('settings.destroy');
+//
+
+use Illuminate\Support\Facades\Route;
+use Modules\Setting\Http\Controllers\SettingController;
+
+Route::get('/settings/user', [SettingController::class, 'index'])->name('settings.user');

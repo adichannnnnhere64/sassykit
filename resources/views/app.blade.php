@@ -4,6 +4,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Workspace</title>
 
     {!! seo() !!}
     <link rel="preload" fetchpriority='high' as="image" href="/desktop-768.webp"

@@ -13,6 +13,7 @@ import { Button, Flex } from '@mantine/core';
 import { produce } from 'immer';
 import { useEffect, useRef, useState } from 'react';
 import ModalLink from '../modal-link';
+import { Head } from '@inertiajs/react'
 
 export default function Board({ initialData = {}, initialColumnNames = {}, board = null }: any) {
     const [columns, setColumns] = useState(initialData);
@@ -247,6 +248,9 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
 
     return (
         <div className="mt-8">
+            <Head>
+                <title>burat</title>
+            </Head>
             <div className="border-b border-gray-200 py-4">
                 <div className="flex items-center justify-between">
                     <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Board: {board?.title ?? ''}</h1>
