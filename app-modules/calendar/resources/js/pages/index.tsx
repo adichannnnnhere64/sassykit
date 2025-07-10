@@ -115,33 +115,36 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
         return { start, end };
     }, []);
 
-const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Views) => {
-    setIsLoading(true);
-    try {
-        const response = await axios.get(route('calendar.events'), {
-            params: {
-                start: start.toISOString(),
-                end: end.toISOString(),
-                view: view === Views.AGENDA ? 'agenda' : null,
-                categories: selectedCategories.length > 0 ? selectedCategories : undefined,
-            },
-        });
+    const fetchEventsForRange = useCallback(
+        async (start: Date, end: Date, view: Views) => {
+            setIsLoading(true);
+            try {
+                const response = await axios.get(route('calendar.events'), {
+                    params: {
+                        start: start.toISOString(),
+                        end: end.toISOString(),
+                        view: view === Views.AGENDA ? 'agenda' : null,
+                        categories: selectedCategories.length > 0 ? selectedCategories : undefined,
+                    },
+                });
 
-        const formattedEvents = response.data.events.map((event: any) => ({
-            ...event,
-            start: new Date(event.start),
-            end: new Date(event.end),
-            categories: event.categories || [],
-        }));
+                const formattedEvents = response.data.events.map((event: any) => ({
+                    ...event,
+                    start: new Date(event.start),
+                    end: new Date(event.end),
+                    categories: event.categories || [],
+                }));
 
-        setEvents(formattedEvents);
-        setCurrentTotal(response.data.total);
-    } catch (error) {
-        console.error('Error fetching events:', error);
-    } finally {
-        setIsLoading(false);
-    }
-}, [selectedCategories]); // Add selectedCategories to dependencies
+                setEvents(formattedEvents);
+                setCurrentTotal(response.data.total);
+            } catch (error) {
+                console.error('Error fetching events:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        [selectedCategories],
+    ); // Add selectedCategories to dependencies
 
     useEffect(() => {
         const { start, end } = calculateDateRange(currentDate, currentView);
@@ -158,7 +161,7 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
             const { allDay } = event;
 
             // if (!allDay && droppedOnAllDaySlot) {
-                // event.allDay = true;
+            // event.allDay = true;
             // }
             // if (allDay && !droppedOnAllDaySlot) {
             event.allDay = false;
@@ -332,9 +335,13 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
             <Stack spacing="lg">
                 <Flex justify="space-between" align="center">
                     <Paper p="md" withBorder>
+                        <div className="flex space-x-4">
                         <Button mb={20} size="xs" onClick={() => open(route('calendar.category.create'), version ?? '', 'xs')}>
                             Add Category
                         </Button>
+
+                            <Button onClick={() => router.visit(route('calendar.category'))} mb={20} size="xs" variant='white' >Edit</Button>
+</div>
                         <Group spacing="sm">
                             {categories.map((category) => (
                                 <div key={category.name} className="flex items-center">
@@ -420,27 +427,25 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
                         <Text size="sm" weight={500}>
                             Filter by:
                         </Text>
-                                {categories.map((category) => (
-            <Badge
-                key={category.id}
-                variant={selectedCategories.includes(category.id) ? 'filled' : 'outline'}
-                style={{
-                    backgroundColor: selectedCategories.includes(category.id) ? category.color : undefined,
-                    color: selectedCategories.includes(category.id) ? 'white' : undefined,
-                    cursor: 'pointer',
-                    textTransform: 'capitalize'
-                }}
-                onClick={() => {
-                    setSelectedCategories(prev =>
-                        prev.includes(category.id)
-                            ? prev.filter(id => id !== category.id)
-                            : [...prev, category.id]
-                    );
-                }}
-            >
-                {category.name}
-            </Badge>
-        ))}
+                        {categories.map((category) => (
+                            <Badge
+                                key={category.id}
+                                variant={selectedCategories.includes(category.id) ? 'filled' : 'outline'}
+                                style={{
+                                    backgroundColor: selectedCategories.includes(category.id) ? category.color : undefined,
+                                    color: selectedCategories.includes(category.id) ? 'white' : undefined,
+                                    cursor: 'pointer',
+                                    textTransform: 'capitalize',
+                                }}
+                                onClick={() => {
+                                    setSelectedCategories((prev) =>
+                                        prev.includes(category.id) ? prev.filter((id) => id !== category.id) : [...prev, category.id],
+                                    );
+                                }}
+                            >
+                                {category.name}
+                            </Badge>
+                        ))}
                         {selectedCategories.length > 0 && (
                             <Button size="xs" variant="subtle" onClick={() => setSelectedCategories([])}>
                                 Clear filters

@@ -25,6 +25,7 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 
     Route::get('/calendars/category/modal', [CalendarCategoryController::class, 'create'])->name('calendar.category.create');
+
     Route::post('/calendars/category', [CalendarCategoryController::class, 'store'])->name('calendar.category.store');
 
     Route::post('/calendar', [ControllersCalendarController::class, 'store'])->name('calendar.store');
@@ -35,6 +36,9 @@ Route::middleware(['web', 'auth'])->group(function () {
 
 
 
+    Route::get('/calendar/category', [CalendarCategoryController::class, 'index'])->name('calendar.category');
+
+    Route::put('/calendar/category/update', [CalendarCategoryController::class, 'updateModel'])->name('calendar.category.update.model');
     Route::delete('/calendar/category/{model}', [CalendarCategoryController::class, 'destroy'])->name('calendar.category.destroy');
     Route::patch('/calendar/category/{model}', [CalendarCategoryController::class, 'update'])->name('calendar.category.update');
 

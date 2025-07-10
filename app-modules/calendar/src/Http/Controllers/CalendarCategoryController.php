@@ -4,23 +4,36 @@ declare(strict_types=1);
 
 namespace Modules\Calendar\Http\Controllers;
 
-use Carbon\Carbon;
-use DateTime;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Modules\Calendar\DTOs\CalendarCategoryData;
-use Modules\Calendar\DTOs\CalendarEventData;
 use Modules\Calendar\Models\CalendarCategory;
 
 final class CalendarCategoryController
 {
-
-    public function create()
+    public function index()
     {
-        return inertia()->render('calendar::modals/create-category');
+
+        return inertia()->render('calendar::category', [
+            'categories' => CalendarCategoryData::collect(auth()->user()->calendarCategories()->get()),
+        ]);
     }
 
-    public function store(Request $request){
+    public function create(Request $request)
+    {
+        $category = null;
+        if ($request->has('id')) {
+
+            $category = CalendarCategory::find($request->id);
+
+        }
+
+        return inertia()->render('calendar::modals/create-category', [
+            'category' => CalendarCategoryData::optional($category),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
 
         $data = $request->validate([
             'name' => 'required|unique:calendar_categories,name',
@@ -29,7 +42,7 @@ final class CalendarCategoryController
 
         $calendarCategory = auth()->user()->calendarCategories()->create($data);
 
-        return redirect()->route('calendar')->with('success', 'Category created successfully');
+        return redirect()->back()->with('success', 'Category created successfully');
     }
 
     public function destroy(Request $request, CalendarCategory $model)
@@ -51,7 +64,29 @@ final class CalendarCategoryController
             'message' => 'Category updated successfully',
         ]);
 
-
     }
 
+    public function updateModel(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:calendar_categories,name,'.$request->id,
+            'color' => 'required',
+            'id' => 'required',
+        ]);
+
+        $model = CalendarCategory::find($request->id);
+
+        if ($model) {
+            $model->update($request->only('name', 'color'));
+
+            return redirect()->back()->with([
+                'message' => 'Category updated successfully',
+            ]);
+        }
+
+        return redirect()->back()->with([
+            'message' => 'Something went wrong',
+        ]);
+
+    }
 }

@@ -3,14 +3,23 @@ import { router, useForm } from '@inertiajs/react';
 import { Button, ColorInput, Group, TextInput } from '@mantine/core';
 import { FormEventHandler } from 'react';
 
-export default function CreateCategory() {
-    const { data, setData, post } = useForm({
-        name: '',
-        color: '#228be6', // Default color
+interface Category {
+    id: number;
+    name: string;
+    color: string;
+}
+
+export default function CreateCategory({ category = null } : { category: Category | null }) {
+    const { data, setData, post, put } = useForm({
+        id : category?.id ?? null,
+        name: category?.name ??  '',
+        color: category?.color ?? '#228be6', // Default color
     });
 
     const submitHandler: FormEventHandler = (e) => {
         e.preventDefault();
+
+        if (category == null) {
         post(route('calendar.category.store'), {
             onSuccess: () => {
                 router.visit(window.location.href, {
@@ -20,6 +29,20 @@ export default function CreateCategory() {
                 close();
             },
         });
+        } else {
+        put(route('calendar.category.update.model'), {
+            onSuccess: () => {
+                router.visit(window.location.href, {
+                    preserveScroll: true,
+                });
+
+                close();
+            },
+        });
+
+        }
+
+
     };
 
     return (
