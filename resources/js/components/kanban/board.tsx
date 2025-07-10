@@ -23,7 +23,15 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
     const [dropdownOpen, setDropdownOpen] = useState(false);
     const [columnOrder, setColumnOrder] = useState(Object.keys(initialData));
     const [columnNames, setColumnNames] = useState(initialColumnNames);
-    const [collapsedColumns, setCollapsedColumns] = useState({});
+
+    // Initialize all columns as collapsed by default
+    const [collapsedColumns, setCollapsedColumns] = useState(() => {
+        const initialCollapsedState = {};
+        Object.keys(initialData).forEach(columnId => {
+            initialCollapsedState[columnId] = true; // Set to true to collapse by default
+        });
+        return initialCollapsedState;
+    });
 
     const sensors = useSensors(
         useSensor(PointerSensor, {
@@ -226,26 +234,6 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
     };
     const csrf_token = String(usePage().props.csrf_token);
 
-    const copyAll = async (board_id: number) => {
-        await fetch(route('board.copy.all'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf_token,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({ board_id }),
-            credentials: 'same-origin',
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                navigator.clipboard.writeText(data.clipboard).then(() => {
-                    alert('Copied to clipboard');
-                });
-            });
-    };
-
     return (
         <div className="mt-8">
             <Head>
@@ -363,6 +351,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
     );
 }
 
+// Rest of the component code remains the same...
 function MiniColumnPreview({ title, cardCount, viewMode }) {
     return (
         <div className={`${viewMode === 'horizontal' ? 'w-72' : 'w-full max-w-md'} flex-shrink-0 rotate-2 transform opacity-95`}>
@@ -445,34 +434,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
 
     const adi = usePage().props;
 
-    //       useEffect(() => {
-    //     if (clipboard) {
-    //             alert('bobo')
-
-    //     }
-    //   }, [clipboard]);
-
     const csrf_token = String(usePage().props.csrf_token);
-
-    const copyAll = async (board_id: number, column_id: number) => {
-        await fetch(route('board.copy.all'), {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-                'X-CSRF-TOKEN': csrf_token,
-                'X-Requested-With': 'XMLHttpRequest',
-            },
-            body: JSON.stringify({ board_id, column_id }),
-            credentials: 'same-origin',
-        })
-            .then((res) => res.json())
-            .then((data) => {
-                navigator.clipboard.writeText(data.clipboard).then(() => {
-                    alert('Copied to clipboard');
-                });
-            });
-    };
 
     const copy = async (board_id: number, column_id: number) => {
         await fetch(route('board.copy'), {
@@ -493,7 +455,6 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                 });
             });
     };
-
 
     const copyWithTitle = async (board_id: number, column_id: number) => {
         await fetch(route('board.copy.title'), {
@@ -608,7 +569,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 Duplicate
                             </Button>
 
-                <ModalLink  href={route('module.kanban.board.generate', { id: board_id, column_id: id })}>Paste</ModalLink>
+                            <ModalLink  href={route('module.kanban.board.generate', { id: board_id, column_id: id })}>Paste</ModalLink>
 
                             <span className="flex text-sm text-gray-500">{cards.length}</span>
                         </div>
