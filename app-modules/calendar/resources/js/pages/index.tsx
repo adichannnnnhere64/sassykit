@@ -100,8 +100,8 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
                 break;
             case Views.AGENDA:
                 // Show 6 months of events in agenda view
-                start = subMonths(new Date(date), 3);
-                end = addMonths(new Date(date), 3);
+                start = subMonths(new Date(date), 0);
+                end = addMonths(new Date(date), 1);
                 break;
             default:
                 start = new Date(date);
@@ -148,10 +148,10 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
         fetchEventsForRange(start, end, currentView);
     }, [currentDate, currentView, fetchEventsForRange, calculateDateRange, selectedCategories]);
 
-    useEffect(() => {
-        const { start, end } = calculateDateRange(currentDate, currentView);
-        fetchEventsForRange(start, end, currentView);
-    }, [currentDate, currentView, fetchEventsForRange, calculateDateRange]);
+    // useEffect(() => {
+    //     const { start, end } = calculateDateRange(currentDate, currentView);
+    //     fetchEventsForRange(start, end, currentView);
+    // }, [currentDate, currentView, fetchEventsForRange, calculateDateRange]);
 
     const handleEventDrop = useCallback(
         ({ event, start, end, isAllDay: droppedOnAllDaySlot = false }) => {
@@ -178,26 +178,6 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
                         allDay: false,
                     },
                 ];
-            });
-
-            router.put(
-                route('calendar.update-time', event.id),
-                { start, end },
-                {
-                    preserveScroll: true,
-                    preserveState: true,
-                },
-            );
-        },
-        [setEvents],
-    );
-
-    const handleEventResize = useCallback(
-        ({ event, start, end }) => {
-            setEvents((prev) => {
-                const existing = prev.find((ev) => ev.id === event.id) ?? {};
-                const filtered = prev.filter((ev) => ev.id !== event.id);
-                return [...filtered, { ...existing, start, end }];
             });
 
             router.put(
@@ -257,7 +237,6 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
     };
 
     const handleViewChange = (view: Views) => {
-        console.log('burik');
         setCurrentView(view);
         // Update URL without reload
         window.history.replaceState({}, '', `?view=${view}&date=${currentDate.toISOString()}`);
@@ -265,7 +244,6 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
 
     // Handle navigation
     const handleNavigate = (date: Date) => {
-        console.log(date);
         setCurrentDate(date);
         // Update URL without reload
         window.history.replaceState({}, '', `?view=${currentView}&date=${date.toISOString()}`);
@@ -470,6 +448,17 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
                         )}
                     </Flex>
                 </Paper>
+
+                <Paper p="md" withBorder>
+                    <Flex justify="space-between" align="center">
+                        <Text size="sm" weight={500}>
+                            Total Amount:
+                        </Text>
+                        <Text size="lg" weight={700}>
+                            ${currentTotal.toLocaleString()}
+                        </Text>
+                    </Flex>
+                </Paper>
                 <DnDCalendar
                     localizer={localizer}
                     events={events}
@@ -510,16 +499,6 @@ const fetchEventsForRange = useCallback(async (start: Date, end: Date, view: Vie
                         showMore: (count) => `+${count} more events`,
                     }}
                 />
-                <Paper p="md" withBorder>
-                    <Flex justify="space-between" align="center">
-                        <Text size="sm" weight={500}>
-                            Total Amount:
-                        </Text>
-                        <Text size="lg" weight={700}>
-                            ${currentTotal.toLocaleString()}
-                        </Text>
-                    </Flex>
-                </Paper>
             </Stack>
         </AppLayout>
     );

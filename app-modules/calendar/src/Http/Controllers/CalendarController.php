@@ -38,6 +38,7 @@ final class CalendarController
             ->whereBetween('start', [$start, $end])
             ->get();
 
+
         return inertia()->render('calendar::index', [
             'defaultCategories' => CalendarCategoryData::collect(auth()->user()->calendarCategories()->get()),
             'defaultEvents' => $events,
@@ -178,7 +179,7 @@ final class CalendarController
             /* 'end_date' => 'required|date', */
             'categories' => 'array|nullable',
             'color' => 'required',
-            'amount' => 'nullable',
+            'amount' => 'integer',
         ]);
 
         $start = $data['start_date'] . ' 12:00:00';
@@ -218,7 +219,7 @@ final class CalendarController
             'start_date' => 'required|date',
             /* 'end_date' => 'required|date', */
             'color' => 'required',
-            'amount' => 'nullable',
+            'amount' => 'integer',
             'categories' => 'nullable|array', // assuming categories is an array of IDs
         ]);
 
