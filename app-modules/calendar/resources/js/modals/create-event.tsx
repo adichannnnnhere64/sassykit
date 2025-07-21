@@ -35,9 +35,9 @@ export default function CreateEvent({
         categories: userCategories || [],
         color: color || '#2e2e2e',
         amount: amount || '',
-        start_date: start_date || new Date().toISOString(),
-        start_time: start_time || '12:00',
-        end_time: end_time || '13:00',
+        start_date: start_date,
+        start_time: start_time || '00:00',
+        end_time: end_time || '01:00',
     });
 
     const handleDeleteEvent = (e: React.MouseEvent) => {
@@ -57,31 +57,17 @@ export default function CreateEvent({
         }
     };
 
-    const formatTime = (date: Date | null): string => {
-        if (!date) return '12:00';
-        const hours = date.getHours().toString().padStart(2, '0');
-        const minutes = date.getMinutes().toString().padStart(2, '0');
-        return `${hours}:${minutes}`;
-    };
-
-    const parseTimeString = (timeString: string): Date => {
-        const [hours, minutes] = timeString.split(':').map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return date;
-    };
-
     const submitHandler: FormEventHandler = (e) => {
         e.preventDefault();
 
         // Combine date and time into ISO strings
-        const startDateTime = new Date(data.start_date);
-        const [startHours, startMinutes] = data.start_time.split(':').map(Number);
-        startDateTime.setHours(startHours, startMinutes);
+        // const startDateTime = new Date(data.start_date);
+        // const [startHours, startMinutes] = data.start_time.split(':').map(Number);
+        // startDateTime.setHours(startHours, startMinutes);
 
-        const endDateTime = new Date(data.start_date);
-        const [endHours, endMinutes] = data.end_time.split(':').map(Number);
-        endDateTime.setHours(endHours, endMinutes);
+        // const endDateTime = new Date(data.start_date);
+        // const [endHours, endMinutes] = data.end_time.split(':').map(Number);
+        // endDateTime.setHours(endHours, endMinutes);
 
         const submitMethod = id ? put : post;
         const routeName = id ? route('calendar.update', { id }) : route('calendar.store');
@@ -115,27 +101,10 @@ export default function CreateEvent({
 
             <DateInput
                 required
-                value={new Date(data.start_date)}
+                value={data.start_date}
                 onChange={(date) => setData('start_date', date)}
                 label="Event Date"
                 placeholder="Select date"
-            />
-
-            <TimeInput
-
-                display={'none'}
-                // required
-                label="Start Time"
-                value={parseTimeString(data.start_time)}
-                onChange={(date) => setData('start_time', formatTime(date))}
-            />
-
-            <TimeInput
-                // required
-                display={'none'}
-                label="End Time"
-                value={parseTimeString(data.end_time)}
-                onChange={(date) => setData('end_time', formatTime(date))}
             />
 
             <MultiSelectCombobox
