@@ -182,3 +182,21 @@
   .no-scrollbar::-webkit-scrollbar {
     display: none;
   }
+
+.rbc-agenda-time-cell {
+    display: none !important;
+}
+
+.rbc-agenda-view .rbc-header:nth-child(2) {
+    display: none !important;
+}
+
+
+.rbc-agenda-date-cell {
+    display: none !important;
+}
+
+.rbc-agenda-view .rbc-header:nth-child(1) {
+    display: none !important;
+}
+

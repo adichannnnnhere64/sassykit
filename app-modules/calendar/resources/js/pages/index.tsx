@@ -255,7 +255,6 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
     const eventPropGetter = (event: Event) => {
         return {
             style: {
-                backgroundColor: event?.color || defaultColor,
                 borderRadius: '4px',
                 color: 'white',
                 fontSize: '12px',
@@ -297,19 +296,15 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
 
     const agendaEventComponent = ({ event }: { event: Event }) => {
         return (
-            <div className="border-b border-gray-200 p-3 transition-colors hover:bg-gray-50">
+            <div className="border-b  p-3 ">
                 <div className="flex items-start justify-between">
                     <div className="flex-1">
                         <div className="font-semibold text-gray-900">{event.title}</div>
                         <div className="mt-1 text-sm text-gray-600">
                             {format(event.start, 'EEEE, MMMM d, yyyy')}
-                            {!event.allDay && (
-                                <>
-                                    {' • '}
-                                    {format(event.start, 'h:mm a')} - {format(event.end, 'h:mm a')}
-                                </>
-                            )}
                         </div>
+
+                    </div>
                         {event.categories?.length > 0 && (
                             <div className="mt-2 flex flex-wrap gap-1">
                                 {event.categories.map((category) => (
@@ -323,7 +318,6 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
                                 ))}
                             </div>
                         )}
-                    </div>
                     {event.amount && <div className="ml-4 text-sm font-semibold text-gray-900">${event.amount.toLocaleString()}</div>}
                 </div>
             </div>
