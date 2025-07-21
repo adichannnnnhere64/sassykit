@@ -193,10 +193,30 @@
 
 
 .rbc-agenda-date-cell {
-    display: none !important;
+    background-color: white !important;
+    color: black !important;
+
+    padding: 1px !important;
+    /* display: none !important; */
 }
 
 .rbc-agenda-view .rbc-header:nth-child(1) {
-    display: none !important;
+    background-color: white !important;
+
+    color: black !important;
+    padding: 12px !important;
+
+    /* display: none !important; */
 }
 
+.rbc-agenda-date-cell {
+    padding: 5px !important;
+}
+
+.rbc-agenda-event-cell {
+    padding: 0 !important;
+}
+
+.rbc-header:nth-child(1) {
+    padding: 5px !important;
+}

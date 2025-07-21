@@ -42,6 +42,7 @@ interface Event {
     start: Date;
     end: Date;
     allDay: boolean;
+    description: string;
     categories: Category[];
     status?: 'pending' | 'completed' | 'cancelled';
     amount?: number;
@@ -255,6 +256,7 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
     const eventPropGetter = (event: Event) => {
         return {
             style: {
+                backgroundColor: event.color,
                 borderRadius: '4px',
                 color: 'white',
                 fontSize: '12px',
@@ -296,17 +298,21 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
 
     const agendaEventComponent = ({ event }: { event: Event }) => {
         return (
-            <div className="border-b  p-3 ">
-                <div className="flex items-start justify-between">
+            <div className="border-b  p-3 bg-white">
+
+
+                <div className="flex items-start justify-between items-center">
+
                     <div className="flex-1">
                         <div className="font-semibold text-gray-900">{event.title}</div>
-                        <div className="mt-1 text-sm text-gray-600">
-                            {format(event.start, 'EEEE, MMMM d, yyyy')}
-                        </div>
 
+                        <div>
+
+                            <span className="text-gray-900" >{event.description}</span>
+                        </div>
                     </div>
                         {event.categories?.length > 0 && (
-                            <div className="mt-2 flex flex-wrap gap-1">
+                            <div className=" flex flex-wrap gap-1">
                                 {event.categories.map((category) => (
                                     <span
                                         key={category.name}
