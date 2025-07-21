@@ -38,6 +38,8 @@ final class CalendarController
             ->whereBetween('start', [$start, $end])
             ->get();
 
+        /* dd($events); */
+
 
         return inertia()->render('calendar::index', [
             'defaultCategories' => CalendarCategoryData::collect(auth()->user()->calendarCategories()->get()),
@@ -179,11 +181,11 @@ final class CalendarController
             /* 'end_date' => 'required|date', */
             'categories' => 'array|nullable',
             'color' => 'required',
-            'amount' => 'integer',
+            'amount' => 'numeric',
         ]);
 
-        $start = $data['start_date'] . ' 12:00:00';
-        $end = $data['start_date'] . ' 12:59:59';
+        $start = $data['start_date'] . ' 00:00:00';
+        $end = $data['start_date'] . ' 00:00:59';
 
         /* dd($data, $start, $end); */
 
@@ -219,12 +221,12 @@ final class CalendarController
             'start_date' => 'required|date',
             /* 'end_date' => 'required|date', */
             'color' => 'required',
-            'amount' => 'integer',
+            'amount' => 'numeric',
             'categories' => 'nullable|array', // assuming categories is an array of IDs
         ]);
 
-        $start = $data['start_date'] . ' 12:00:00';
-        $end = $data['start_date'] . ' 12:59:59';
+        $start = $data['start_date'] . ' 00:00:00';
+        $end = $data['start_date'] . ' 00:00:59';
 
         $model->update([
             'title' => @$data['title'] ?? null, // Fallback to null if key doesn't exist

@@ -167,7 +167,7 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
             event.allDay = false;
             // }
 
-            console.log(start, end);
+            // console.log(start, end);
 
             setEvents((prev) => {
                 const existing = prev.find((ev) => ev.id === event.id) ?? {};
@@ -265,12 +265,12 @@ export default function CalendarPage({ defaultCategories = [], defaultEvents = [
     };
 
     const eventComponent = ({ event }: { event: Event }) => {
-        console.log(event);
+        // console.log(event);
         return (
             <div>
                 <div className="grid grid-cols-2">
                     <strong>{event.title}</strong>
-                    {event.amount && <strong className="text-right">${event.amount.toLocaleString()}</strong>}
+                    {event.amount && <strong className="text-right">${event.amount}</strong>}
                 </div>
                 {event.categories?.length > 0 && (
                     <div style={{ marginTop: 4, display: 'flex', flexWrap: 'wrap', gap: 4 }}>
