@@ -237,7 +237,7 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
     return (
         <div className="mt-8">
             <Head>
-                <title>burat</title>
+                <title>Board</title>
             </Head>
             <div className="border-b border-gray-200 py-4">
                 <div className="flex items-center justify-between">
@@ -267,9 +267,8 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                                         setViewMode('horizontal');
                                         setDropdownOpen(false);
                                     }}
-                                    className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${
-                                        viewMode === 'horizontal' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                                    }`}
+                                    className={`w-full px-4 py-2 text-left text-sm hover:bg-gray-50 ${viewMode === 'horizontal' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                                        }`}
                                 >
                                     Horizontal View
                                 </button>
@@ -278,9 +277,8 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
                                         setViewMode('vertical');
                                         setDropdownOpen(false);
                                     }}
-                                    className={`w-full rounded-b-lg px-4 py-2 text-left text-sm hover:bg-gray-50 ${
-                                        viewMode === 'vertical' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
-                                    }`}
+                                    className={`w-full rounded-b-lg px-4 py-2 text-left text-sm hover:bg-gray-50 ${viewMode === 'vertical' ? 'bg-blue-50 text-blue-700' : 'text-gray-700'
+                                        }`}
                                 >
                                     Vertical View
                                 </button>
@@ -569,7 +567,7 @@ function Column({ id, title, cards, viewMode, onNameChange, isCollapsed, onToggl
                                 Duplicate
                             </Button>
 
-                            <ModalLink  href={route('module.kanban.board.generate', { id: board_id, column_id: id })}>Paste</ModalLink>
+                            <ModalLink href={route('module.kanban.board.generate', { id: board_id, column_id: id })}>Paste</ModalLink>
 
                             <span className="flex text-sm text-gray-500">{cards.length}</span>
                         </div>
@@ -639,9 +637,8 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 style={style}
                 {...attributes}
                 {...listeners}
-                className={`group relative  cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${
-                    isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
-                } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? '' : 'min-h-[100px]'}`}
+                className={`group relative  cursor-grab rounded-lg border border-gray-200 bg-white p-2 hover:border-gray-300 hover:shadow-sm active:cursor-grabbing dark:bg-gray-600 dark:text-white ${isDragOverlay ? 'cursor-grabbing border-2 border-blue-500 shadow-xl' : ''
+                    } ${over ? 'bg-blue-50/30 ring-2 ring-blue-400' : ''} ${viewMode === 'vertical' ? '' : 'min-h-[100px]'}`}
             >
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
@@ -697,7 +694,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 {/* Card content */}
                 <div className={`flex h-full flex-col ${viewMode === 'vertical' ? 'justify-between' : ''}`}>
                     <div
-                        className={`no-scrollbar overflow-scroll text-sm font-medium [-ms-overflow-style:none] [scrollbar-width:none] ${viewMode === 'vertical' ? '' : ''}`}
+                        className={`no-scrollbar overflow-scroll text-sm font-medium [-ms-overflow-style:none] [scrollbar-width:none] whitespace-pre-line ${viewMode === 'vertical' ? '' : ''}`}
                     >
                         {title}
                     </div>
@@ -707,7 +704,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                             <Link href={route('module.kanban.card.show', { card_id: id })}>
                                 <img
                                     className="h-full w-full object-cover"
-                                    src={image}
+                                    src={`${image}`}
                                     alt={title}
                                     style={{
                                         aspectRatio: '1/1', // Ensures square aspect ratio
