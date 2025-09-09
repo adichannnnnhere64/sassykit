@@ -43,6 +43,8 @@ Route::group(['prefix' => 'cards', 'middleware' => 'auth'], function () {
 
     Route::get('/edit', [CardCreateController::class, 'editCard'])->name('module.kanban.card.edit');
 
+    Route::get('/copy', [BoardCopyController::class, 'copy'])->name('module.kanban.card.copy');
+
     Route::get('/confirm-delete', [CardCreateController::class, 'confirmDelete'])->name('module.kanban.card.confirm-delete');
 
     Route::delete('/delete', [CardCreateController::class, 'destroy'])->name('module.kanban.card.delete');

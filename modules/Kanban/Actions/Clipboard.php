@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Module\Kanban\Actions;
 
 use Module\Kanban\Models\Board;
+use Module\Kanban\Models\Card;
 
 final class Clipboard
 {
@@ -24,6 +25,13 @@ final class Clipboard
 
         return implode("\n\n", $board->columns()->where('title', $data['column_id'])
             ->pluck('cards')->flatten()->pluck('content')->toArray());
+    }
+
+    public function copy(array $data)
+    {
+        $board = Card::find($data['id'])->content;
+
+        return $board;
     }
 
     public function copyWithTitle(array $data)

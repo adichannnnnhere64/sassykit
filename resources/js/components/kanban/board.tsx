@@ -643,6 +643,25 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
                     <div className="absolute -top-1 right-2 z-10 flex  opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+                        <ModalLink href={route('module.kanban.card.copy', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="14"
+                                height="14"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                className="icon icon-tabler icons-tabler-outline icon-tabler-copy"
+                            >
+                                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                <rect x="9" y="9" width="10" height="10" rx="2" />
+                                <rect x="5" y="5" width="10" height="10" rx="2" />
+                            </svg>
+                        </ModalLink>
+
                         <ModalLink href={route('module.kanban.card.edit', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"

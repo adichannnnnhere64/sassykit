@@ -24,6 +24,13 @@ final class BoardCopyController extends Controller
         ]);
     }
 
+    public function copy(Request $request, Clipboard $clipboard)
+    {
+        return response()->json([
+            'clipboard' => $clipboard->copy($request->all()),
+        ]);
+    }
+
     public function copyWithTitle(Request $request, Clipboard $clipboard)
     {
         return response()->json([
