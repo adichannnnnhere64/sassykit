@@ -15,11 +15,11 @@ const breadcrumbs: BreadcrumbItem[] = [
 
 ];
 
-export default function Index({ initialData, initialColumnNames, board }: { initialData: any; initialColumnNames: any, board: Module.Kanban.DTOs.BoardData }) {
+export default function Index({ initialData, initialDefaultColumn, initialColumnNames, board }: { initialData: any; initialDefaultColumn: string, initialColumnNames: any, board: Module.Kanban.DTOs.BoardData }) {
     return (
         <AppLayout breadcrumbs={breadcrumbs}>
             <Head title="Boards" />
-            <Board board={board} initialData={initialData} initialColumnNames={initialColumnNames} />
+            <Board board={board} initialDefaultColumn={initialDefaultColumn} initialData={initialData} initialColumnNames={initialColumnNames} />
         </AppLayout>
     );
 }

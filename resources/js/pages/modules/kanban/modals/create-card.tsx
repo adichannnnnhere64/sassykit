@@ -24,8 +24,12 @@ export default function CreateCard({ column_id, board_id }: { column_id: string 
         post(route('module.kanban.card.store'), {
             preserveScroll: true,
             onSuccess: () => {
+                console.log(column_id)
                 router.visit(route('module.kanban.board.show', board_id), {
                     preserveScroll: true,
+                    data: {
+                        default_column_open: column_id
+                    }
                 });
                 close();
             },

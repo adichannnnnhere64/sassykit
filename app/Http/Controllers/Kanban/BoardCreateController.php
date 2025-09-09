@@ -98,6 +98,7 @@ final class BoardCreateController extends Controller
 
         return Inertia::render('modules/kanban/show', [
             'board' => BoardData::from($board),
+            'initialDefaultColumn' => request('default_column_open') ?? null,
             'initialData' => $initialData,
             'initialColumnNames' => $initialColumnNames,
         ]);

@@ -15,7 +15,7 @@ import { useEffect, useRef, useState } from 'react';
 import ModalLink from '../modal-link';
 import { Head } from '@inertiajs/react'
 
-export default function Board({ initialData = {}, initialColumnNames = {}, board = null }: any) {
+export default function Board({ initialData = {}, initialDefaultColumn = null, initialColumnNames = {}, board = null }: any) {
     const [columns, setColumns] = useState(initialData);
     const [activeId, setActiveId] = useState(null);
     const [activeType, setActiveType] = useState(null);
@@ -28,7 +28,14 @@ export default function Board({ initialData = {}, initialColumnNames = {}, board
     const [collapsedColumns, setCollapsedColumns] = useState(() => {
         const initialCollapsedState = {};
         Object.keys(initialData).forEach(columnId => {
+            console.log(initialDefaultColumn, columnId)
+            if (initialDefaultColumn == columnId) {
+            initialCollapsedState[columnId] = false; // Set to true to collapse by default
+            } else {
             initialCollapsedState[columnId] = true; // Set to true to collapse by default
+
+            }
+
         });
         return initialCollapsedState;
     });
