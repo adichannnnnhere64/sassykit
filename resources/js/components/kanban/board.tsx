@@ -629,6 +629,29 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
         willChange: isDragging ? 'transform' : 'auto',
     };
 
+    const csrf_token = String(usePage().props.csrf_token);
+    const copyContent = async (card_id: number) => {
+        await fetch(route('module.kanban.card.copy'), {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                Accept: 'application/json',
+                'X-CSRF-TOKEN': csrf_token,
+                'X-Requested-With': 'XMLHttpRequest',
+            },
+            body: JSON.stringify({ card_id }),
+            credentials: 'same-origin',
+        })
+            .then((res) => res.json())
+            .then((data) => {
+            console.log(data.clipboard)
+                navigator.clipboard.writeText(data.clipboard).then(() => {
+                    alert('Copied to clipboard');
+                });
+            });
+    };
+
+
     return (
         <div>
             <h3 className="pb-2 text-xs font-bold">{head_title}<span className="opacity-0">.</span></h3>
@@ -643,7 +666,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                 {/* Delete button - only shows on hover */}
                 {!isDragOverlay && (
                     <div className="absolute -top-1 right-2 z-10 flex  opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                        <ModalLink href={route('module.kanban.card.copy', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
+                        <Button onClick={() => copyContent(id)} className="rounded-full text-sm opacity-60 shadow-md">
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="14"
@@ -660,7 +683,7 @@ function Card({ id, title, head_title, image, isDragOverlay = false, viewMode = 
                                 <rect x="9" y="9" width="10" height="10" rx="2" />
                                 <rect x="5" y="5" width="10" height="10" rx="2" />
                             </svg>
-                        </ModalLink>
+                        </Button>
 
                         <ModalLink href={route('module.kanban.card.edit', { id: id })} className="rounded-full text-sm opacity-60 shadow-md">
                             <svg

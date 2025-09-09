@@ -29,8 +29,7 @@ final class Clipboard
 
     public function copy(array $data)
     {
-        $board = Card::find($data['id'])->content;
-
+        $board = Card::find($data['card_id'])->content;
         return $board;
     }
 
